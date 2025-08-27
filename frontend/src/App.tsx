@@ -1132,7 +1132,7 @@ const ProjectsSection = () => {
       : portfolioData.projects.filter((project) => project.category === filter);
 
   return (
-    <section id="projects" className="py-24 px-4">
+    <section id="project" className="py-24 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
@@ -1635,19 +1635,16 @@ const ContactSection = () => {
     success: false,
     error: null,
   });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ loading: true, success: false, error: null });
 
     try {
       // Get API endpoint from environment variables
-      // const apiEndpoint =
-      //   process.env.REACT_APP_API_URL ||
-      //   process.env.NEXT_PUBLIC_API_URL ||
-      //   "http://localhost:5000";
+      const apiEndpoint =
+        import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-      const response = await fetch(`http://localhost:5000/api/contact`, {
+      const response = await fetch(`${apiEndpoint}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
