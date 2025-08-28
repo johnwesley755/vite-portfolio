@@ -127,7 +127,7 @@ const portfolioData = {
         "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=300&fit=crop",
       role: "Full Stack and AI/ML",
       techStack: ["Python", "Flask", "React", "Diffusion models"],
-      demoLink: "https://github.com/johnwesley755/shorts-video",
+      demoLink: "https://shorts-video-alpha.vercel.app/",
       githubLink: "https://github.com/johnwesley755/shorts-video",
       category: "AI/ML",
       status: "Beta",
