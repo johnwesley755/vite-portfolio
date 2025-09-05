@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import ibmImg from "./assets/ibm.png";
 import uiuxImg from "./assets/uiux.jpg";
+import courseraImg from "./assets/java.jpeg";
 import { href } from "react-router-dom";
 import resumePdf from "./assets/resume.pdf";
 // Portfolio Data
@@ -1324,8 +1325,7 @@ const EnhancedExperienceSection = () => {
         "Advanced frontend development course focusing on modern JavaScript frameworks, responsive design, and integration with Java backend systems.",
       skills: ["HTML", "CSS", "Javascript", "Angular", "Bootstrap"],
       icon: "Code",
-      certImage:
-        "https://media.licdn.com/dms/image/v2/D562DAQH5E9Q3Rt3muA/profile-treasury-image-shrink_800_800/B56Zdtg2CGGoAY-/0/1749889018444?e=1756918800&v=beta&t=UKFx52Jye2f10FfZ2XevUw2tb5j_4kp1sKc-_zVm7uM",
+      certImage: courseraImg,
       achievements: [
         "Built responsive web applications",
         "Mastered Angular framework",
