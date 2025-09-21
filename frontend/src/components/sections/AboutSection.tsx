@@ -36,9 +36,9 @@ export const AboutSection = () => {
     },
     {
       icon: Globe,
-      title: "DevOps & Deployment",
+      title: "Deployment",
       description: "Full-stack web applications with modern frameworks.",
-      technologies: ["Docker", "AWS", "Vercel", "CI/CD"],
+      technologies: ["Docker", "Render", "Vercel"],
     },
   ];
 
