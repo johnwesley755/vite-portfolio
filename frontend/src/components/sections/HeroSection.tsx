@@ -229,7 +229,7 @@ export const HeroSection = () => {
                 {/* Main image container - SIZE REDUCED */}
                 <div className="relative w-[350px] h-[350px] lg:w-[450px] lg:h-[450px] mx-auto">
                   {/* Enhanced glowing border effect */}
-                  <div className="absolute -inset-4 bg-gradient-to-r from-green-500/30 via-emerald-400/40 to-green-500/30 rounded-[3rem] blur-lg animate-pulse" />
+                  <div className="absolute -inset-4 rounded-[3rem] blur-lg animate-pulse" />
                   <div className="absolute -inset-2 bg-gradient-to-r from-green-500/20 via-emerald-400/30 to-green-500/20 rounded-[2.5rem] blur-md" />
 
                   {/* Image container with enhanced styling */}
@@ -241,26 +241,14 @@ export const HeroSection = () => {
                     />
 
                     {/* Enhanced overlay effects */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-emerald-500/5" />
 
                     {/* Enhanced corner accents */}
-                    <div className="absolute top-6 right-6 w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50" />
-                    <div
-                      className="absolute bottom-6 left-6 w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"
-                      style={{ animationDelay: "1s" }}
-                    />
 
                     {/* Additional decorative elements */}
-                    <div className="absolute top-6 left-6 w-8 h-px bg-green-500/60" />
-                    <div className="absolute top-6 left-6 w-px h-8 bg-green-500/60" />
-                    <div className="absolute bottom-6 right-6 w-6 h-px bg-emerald-400/60" />
-                    <div className="absolute bottom-6 right-6 w-px h-6 bg-emerald-400/60" />
                   </div>
 
                   {/* Floating status indicator */}
                   <div className="absolute -bottom-6 left-8 flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-600 rounded-2xl shadow-xl backdrop-blur-sm">
-                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50" />
                     <span className="text-sm text-gray-300 font-medium">
                       Available for work
                     </span>
@@ -268,19 +256,6 @@ export const HeroSection = () => {
                 </div>
 
                 {/* Enhanced decorative elements */}
-                <div className="absolute -top-12 -left-12 w-20 h-20 border border-green-500/20 rounded-full animate-pulse" />
-                <div
-                  className="absolute -bottom-12 -right-12 w-16 h-16 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl animate-pulse"
-                  style={{ animationDelay: "1.5s" }}
-                />
-                <div
-                  className="absolute top-1/4 -right-8 w-2 h-16 bg-gradient-to-b from-green-500/20 to-transparent rounded-full animate-pulse"
-                  style={{ animationDelay: "2.5s" }}
-                />
-                <div
-                  className="absolute bottom-1/4 -left-6 w-12 h-12 border border-emerald-500/15 rotate-45 animate-pulse"
-                  style={{ animationDelay: "3.5s" }}
-                />
               </div>
             </div>
           </div>

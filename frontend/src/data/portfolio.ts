@@ -19,7 +19,7 @@ export const portfolioData = {
     twitter: "https://x.com/JohnWesley97513",
     resume: resumePdf,
     avatar:
-      "https://media.licdn.com/dms/image/v2/D5603AQE9NzsI3qyoTg/profile-displayphoto-scale_400_400/B56ZhF_rxTHMAg-/0/1753520981046?e=1759363200&v=beta&t=GEncn8R5EcyxOQGtePYm4ye5UPbaDvo51zYJiS80Dy4",
+      "https://t3.ftcdn.net/jpg/06/01/17/18/360_F_601171867_X85WpWCcMzNsoMWtMxiZQspKzaOwCyuK.jpg",
   },
   skills: {
     Frontend: {
