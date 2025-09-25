@@ -57,7 +57,7 @@ const aboutData = {
     {
       icon: Briefcase,
       date: "2025",
-      title: "Frontend Developer at DocFacet",
+      title: "Frontend Development Intern at DocFacet",
       description:
         "Honed my skills in React and Tailwind CSS building responsive UIs for large-scale applications.",
     },
