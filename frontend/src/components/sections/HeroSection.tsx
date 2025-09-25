@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { portfolioData } from "../../data/portfolio";
 import resumePdf from "../../assets/resume.pdf";
-
+import modelGlb from "../../../public/models/model.glb";
 // React Three Fiber & Drei
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
@@ -70,7 +70,7 @@ export const HeroSection = () => {
           <pointLight position={[0, 10, 5]} intensity={1.5} />
           <spotLight position={[10, 10, 10]} intensity={1.0} />
           <Suspense fallback={null}>
-            <Model url="/models/model.glb" />
+            <Model url={modelGlb} />
           </Suspense>
           <OrbitControls
             enableZoom={true}
