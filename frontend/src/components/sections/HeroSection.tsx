@@ -1,15 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import {
   Github,
   Linkedin,
   Twitter,
   Download,
   ChevronRight,
-  Mail,
-  MapPin,
 } from "lucide-react";
 import { portfolioData } from "../../data/portfolio";
 import resumePdf from "../../assets/resume.pdf";
+
+// React Three Fiber & Drei
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+
+// 3D Model Loader - Medium scale for balanced visibility
+function Model({ url }) {
+  const { scene } = useGLTF(url);
+  return <primitive object={scene} scale={0.25} position={[0, -1, 0]} />;
+}
 
 export const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -46,47 +54,79 @@ export const HeroSection = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden font-sans max-md:mt-20"
+      className="relative min-h-screen bg-black text-white overflow-hidden font-sans max-md:mt-20"
     >
+      {/* Background 3D Model Canvas - Full Screen with Interactive Controls */}
+      <div className="absolute inset-0 z-0 mt-40">
+        <Canvas
+          camera={{ position: [0, 0, 18], fov: 35 }}
+          style={{ cursor: "grab" }}
+          onPointerDown={(e) => (e.target.style.cursor = "grabbing")}
+          onPointerUp={(e) => (e.target.style.cursor = "grab")}
+        >
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[5, 5, 5]} intensity={1.2} />
+          <directionalLight position={[-5, -5, -5]} intensity={0.8} />
+          <pointLight position={[0, 10, 5]} intensity={1.5} />
+          <spotLight position={[10, 10, 10]} intensity={1.0} />
+          <Suspense fallback={null}>
+            <Model url="/models/model.glb" />
+          </Suspense>
+          <OrbitControls
+            enableZoom={true}
+            enablePan={true}
+            enableRotate={true}
+            autoRotate={true}
+            autoRotateSpeed={1.5}
+            enableDamping={true}
+            dampingFactor={0.02}
+            maxDistance={30}
+            minDistance={12}
+            rotateSpeed={1.2}
+            zoomSpeed={1.2}
+            panSpeed={1.0}
+            makeDefault
+          />
+        </Canvas>
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/75" />
+      </div>
+
       {/* Enhanced Animated Background */}
-      <div className="absolute inset-0">
-        {/* Dynamic gradient overlay that follows mouse */}
+      <div className="absolute inset-0 z-[1]">
         <div
-          className="absolute inset-0 opacity-20 transition-all duration-300"
+          className="absolute inset-0 opacity-15 transition-all duration-300"
           style={{
-            background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(34, 197, 94, 0.4) 0%, rgba(16, 185, 129, 0.2) 30%, transparent 70%)`,
+            background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(34, 197, 94, 0.3) 0%, rgba(16, 185, 129, 0.15) 30%, transparent 70%)`,
           }}
         />
 
-        {/* Enhanced floating geometric shapes */}
-        <div className="absolute top-16 left-8 w-40 h-40 border border-green-500/15 rotate-45 animate-pulse rounded-lg" />
+        <div className="absolute top-16 left-8 w-40 h-40 border border-green-500/10 rotate-45 animate-pulse rounded-lg" />
         <div
-          className="absolute bottom-20 right-16 w-32 h-32 border-2 border-green-500/20 rounded-full animate-pulse"
+          className="absolute bottom-20 right-16 w-32 h-32 border-2 border-green-500/15 rounded-full animate-pulse"
           style={{ animationDelay: "1s" }}
         />
         <div
-          className="absolute top-1/3 right-1/3 w-3 h-24 bg-gradient-to-b from-green-500/30 to-transparent animate-pulse rounded-full"
+          className="absolute top-1/3 right-1/3 w-3 h-24 bg-gradient-to-b from-green-500/20 to-transparent animate-pulse rounded-full"
           style={{ animationDelay: "2s" }}
         />
         <div
-          className="absolute bottom-1/3 left-1/4 w-20 h-20 border border-green-500/10 rotate-12 animate-pulse"
+          className="absolute bottom-1/3 left-1/4 w-20 h-20 border border-green-500/8 rotate-12 animate-pulse"
           style={{ animationDelay: "3s" }}
         />
 
-        {/* Enhanced grid pattern */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-5"
           style={{
             backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
           }}
         />
 
-        {/* Floating particles */}
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-green-500/30 rounded-full animate-ping"
+            className="absolute w-1 h-1 bg-green-500/20 rounded-full animate-ping"
             style={{
               left: `${20 + i * 15}%`,
               top: `${30 + (i % 3) * 20}%`,
@@ -97,70 +137,67 @@ export const HeroSection = () => {
         ))}
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 flex items-center min-h-screen py-20">
+      {/* Main Content - Centered */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen py-20">
         <div className="container mx-auto px-6 lg:px-12 xl:px-16">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
-            {/* Left Content - Enhanced */}
+          <div className="flex flex-col items-center justify-center text-center">
+            {/* Centered Content */}
             <div
-              className={`lg:w-1/2 text-center lg:text-left space-y-8 transition-all duration-1000 ${
+              className={`max-w-4xl space-y-7 transition-all duration-1000 ${
                 isVisible
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 -translate-x-10"
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
               }`}
             >
-              {/* Enhanced Greeting */}
               <div className="space-y-4">
-                <div className="flex items-center justify-center lg:justify-start gap-2">
-                  <div className="w-12 h-px bg-gradient-to-r from-green-500 to-transparent" />
-                  <p className="text-md md:text-lg text-green-400 font-medium tracking-[0.2em] uppercase">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-12 h-px bg-gradient-to-r from-transparent via-green-500 to-transparent" />
+                  <p className="text-sm md:text-base text-green-400 font-medium tracking-[0.2em] uppercase">
                     Hello, I'm
                   </p>
+                  <div className="w-12 h-px bg-gradient-to-r from-transparent via-green-500 to-transparent" />
                 </div>
 
-                {/* Enhanced Name - FONT SIZE REDUCED */}
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
+                {/* Name - Medium sized */}
+                <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight tracking-tight">
                   <span className="bg-gradient-to-r from-white via-green-100 to-gray-300 bg-clip-text text-transparent">
                     {portfolioData.personal.name.split(" ")[0]}
                   </span>
-                  <br />
-                  <span className="bg-gradient-to-r from-green-400 via-green-500 to-emerald-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-green-400 via-green-500 to-emerald-400 bg-clip-text text-transparent ml-4">
                     {portfolioData.personal.name.split(" ")[1]}
                   </span>
                   <span
-                    className="inline-block ml-4 text-4xl md:text-5xl animate-bounce"
+                    className="inline-block ml-3 text-2xl md:text-4xl lg:text-5xl animate-bounce"
                     style={{ animationDelay: "2s" }}
                   >
                     👋
                   </span>
                 </h1>
 
-                {/* Enhanced accent elements */}
-                <div className="flex items-center justify-center lg:justify-start gap-4">
-                  <div className="w-16 h-1 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" />
+                <div className="flex items-center justify-center gap-4">
+                  <div className="w-16 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent rounded-full" />
                   <div className="w-8 h-1 bg-green-500/50 rounded-full" />
-                  <div className="w-4 h-1 bg-green-500/30 rounded-full" />
+                  <div className="w-16 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent rounded-full" />
                 </div>
               </div>
 
-              {/* Enhanced Description - FONT SIZE REDUCED */}
-              <div className="space-y-4">
-                <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
+              <div className="space-y-6">
+                <p className="text-base md:text-lg lg:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed font-light backdrop-blur-sm bg-black/30 rounded-2xl p-5 border border-white/10">
                   {portfolioData.personal.bio}
                 </p>
 
-                {/* Status */}
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <span>Available for opportunities</span>
+                <div className="flex items-center justify-center gap-6 text-gray-300">
+                  <div className="flex items-center gap-2 backdrop-blur-sm bg-black/30 rounded-full px-5 py-2 border border-white/10">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-sm md:text-base">
+                      Available for opportunities
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Enhanced Action Buttons - FONT SIZE & PADDING REDUCED */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
-                <button className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 rounded-xl text-black transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
+                <button className="group relative inline-flex items-center justify-center px-9 py-4 text-base font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 rounded-xl text-black transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <a
                     href="#project"
@@ -173,7 +210,7 @@ export const HeroSection = () => {
 
                 <button
                   onClick={handleDownload}
-                  className="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border-2 border-gray-600 hover:border-green-500 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-500/10 overflow-hidden"
+                  className="group relative inline-flex items-center justify-center px-9 py-4 text-base font-bold text-white border-2 border-gray-600 hover:border-green-500 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-500/10 overflow-hidden backdrop-blur-sm bg-black/30"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <span className="relative z-10 flex items-center">
@@ -183,8 +220,7 @@ export const HeroSection = () => {
                 </button>
               </div>
 
-              {/* Enhanced Social Links */}
-              <div className="flex items-center justify-center lg:justify-start space-x-6 pt-6">
+              <div className="flex items-center justify-center space-x-6 pt-7">
                 {[
                   {
                     icon: Github,
@@ -207,76 +243,26 @@ export const HeroSection = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative p-3 rounded-xl border border-gray-700 hover:border-green-500/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/20 bg-gray-900/50 hover:bg-gray-800/50"
+                    className="group relative p-3 rounded-xl border border-gray-600/50 hover:border-green-500/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/20 backdrop-blur-sm bg-black/30 hover:bg-black/40"
                     title={social.label}
                   >
-                    <social.icon className="h-6 w-6 text-gray-400 group-hover:text-green-500 transition-colors duration-300" />
-                    <div className="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-300" />
+                    <social.icon className="h-6 w-6 text-gray-300 group-hover:text-green-500 transition-colors duration-300" />
+                    <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-300" />
                   </a>
                 ))}
               </div>
-            </div>
 
-            {/* Right Content - Profile Image - SIZE REDUCED */}
-            <div
-              className={`lg:w-1/2 flex items-center justify-center mt-12 lg:mt-0 transition-all duration-1000 delay-300 ${
-                isVisible
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 translate-x-10"
-              }`}
-            >
-              <div className="relative w-full max-w-lg">
-                {/* Main image container - SIZE REDUCED */}
-                <div className="relative w-[350px] h-[350px] lg:w-[450px] lg:h-[450px] mx-auto">
-                  {/* Enhanced glowing border effect */}
-                  <div className="absolute -inset-4 rounded-[3rem] blur-lg animate-pulse" />
-                  <div className="absolute -inset-2 bg-gradient-to-r from-green-500/20 via-emerald-400/30 to-green-500/20 rounded-[2.5rem] blur-md" />
-
-                  {/* Image container with enhanced styling */}
-                  <div className="relative w-full h-full rounded-[2rem] overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700 shadow-2xl">
-                    <img
-                      src={portfolioData.personal.avatar}
-                      alt={portfolioData.personal.name}
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-                    />
-
-                    {/* Enhanced overlay effects */}
-
-                    {/* Enhanced corner accents */}
-
-                    {/* Additional decorative elements */}
-                  </div>
-
-                  {/* Floating status indicator */}
-                  <div className="absolute -bottom-6 left-8 flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-600 rounded-2xl shadow-xl backdrop-blur-sm">
-                    <span className="text-sm text-gray-300 font-medium">
-                      Available for work
-                    </span>
-                  </div>
+              {/* Status indicator */}
+              <div className="flex items-center justify-center pt-5">
+                <div className="flex items-center gap-3 px-7 py-3 bg-gradient-to-r from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-2xl shadow-xl backdrop-blur-md">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-base text-gray-200 font-medium">
+                    Available for work
+                  </span>
                 </div>
-
-                {/* Enhanced decorative elements */}
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Enhanced Scroll Indicator */}
-      <div
-        className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 transition-all duration-1000 delay-1000 ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
-      >
-        <div className="flex flex-col items-center text-gray-500">
-          <span className="text-xs mb-4 tracking-[0.2em] uppercase font-medium">
-            Scroll Down
-          </span>
-          <div className="relative">
-            <div className="w-px h-16 bg-gradient-to-b from-green-500 via-green-500/50 to-transparent" />
-            <div className="absolute top-0 w-px h-8 bg-green-500 animate-pulse" />
-          </div>
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce mt-3 shadow-lg shadow-green-500/50" />
         </div>
       </div>
     </section>
