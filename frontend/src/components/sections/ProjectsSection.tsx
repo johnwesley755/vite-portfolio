@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useInteraction } from '../../lib/interaction-context';
 import { ExternalLink, Github, ArrowUpRight, Sparkles, Brain, Video, MessageCircle, ShoppingCart, Globe, Music, Star, Eye, Zap, Heart } from 'lucide-react';
 
 // INTERFACE DEFINITION
@@ -330,6 +331,7 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({ project })
 // MAIN PROJECTS SECTION COMPONENT
 const ProjectsSection: React.FC = () => {
   const [filter, setFilter] = useState<string>('all');
+  const { selectedSkill } = useInteraction();
   
   const categories = [
     { name: 'all', label: '✨ All Projects', count: projectsData.length },
@@ -338,9 +340,13 @@ const ProjectsSection: React.FC = () => {
     { name: 'E-Commerce', label: '🛒 E-Commerce', count: projectsData.filter(p => p.category === 'E-Commerce').length },
   ];
   
-  const filteredProjects = filter === 'all' 
+  const byCategory = filter === 'all' 
     ? projectsData 
     : projectsData.filter(project => project.category === filter);
+
+  const filteredProjects = selectedSkill
+    ? byCategory.filter(p => p.techStack.some(t => t.toLowerCase().includes(selectedSkill.toLowerCase())))
+    : byCategory;
 
   return (
     <section className="min-h-screen bg-black py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden" id="projects">
@@ -377,6 +383,11 @@ const ProjectsSection: React.FC = () => {
               </span>
             </button>
           ))}
+          {selectedSkill && (
+            <span className="px-3 py-2 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              Filter: {selectedSkill}
+            </span>
+          )}
         </div>
 
         {/* ✅ **IMPROVEMENT 2: The Corrected Masonry Grid** */}

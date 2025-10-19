@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useInteraction } from "../../lib/interaction-context";
 import {
   Award,
   Code,
@@ -69,6 +70,7 @@ const BackgroundFX = () => (
 export const EnhancedExperienceSection = () => {
   const [activeExp, setActiveExp] = useState<number | null>(portfolioData.experiences[0]?.id || null);
   const experiences = portfolioData.experiences;
+  const { selectedSkill } = useInteraction();
 
   const getIconComponent = (iconName?: string) => {
     const icons: { [key: string]: React.ElementType } = { Award, Code, Sparkles, Trophy, Shield, Rocket };
@@ -100,7 +102,7 @@ export const EnhancedExperienceSection = () => {
           <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-1 h-full bg-gradient-to-b from-teal-500/50 via-green-500/50 to-transparent rounded-full"></div>
 
           <div className="space-y-16">
-            {experiences.map((exp, index) => {
+            {(selectedSkill ? experiences.filter(e => e.skills.some(s => s.toLowerCase().includes(selectedSkill.toLowerCase()))) : experiences).map((exp, index) => {
               const IconComponent = getIconComponent(exp.icon);
               const isEven = index % 2 === 0;
               const isActive = activeExp === exp.id;

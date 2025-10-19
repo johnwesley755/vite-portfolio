@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { portfolioData } from "../../data/portfolio";
+import { useInteraction } from "../../lib/interaction-context";
 
 // Background with Modern Geometric Shapes
 const EnhancedBackgroundShapes = () => {
@@ -151,6 +152,7 @@ const EnhancedBackgroundShapes = () => {
 
 // Skill Badge Component
 const EnhancedSkillBadge = ({ skill, delay = 0 }) => {
+  const { setSelectedSkill } = useInteraction();
   return (
     <motion.div
       className="group relative"
@@ -170,6 +172,7 @@ const EnhancedSkillBadge = ({ skill, delay = 0 }) => {
         transition: { type: "spring", stiffness: 400, damping: 25 },
       }}
     >
+      <button onClick={() => setSelectedSkill(skill.name)} className="w-full text-left">
       <div className="relative p-4 bg-black/70 border border-gray-700/40 rounded-2xl backdrop-blur-sm group-hover:border-teal-500/60 transition-all duration-500 overflow-hidden">
         <div className="relative flex items-center gap-4">
           <div className="relative flex-shrink-0">
@@ -200,6 +203,7 @@ const EnhancedSkillBadge = ({ skill, delay = 0 }) => {
 
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl" />
       </div>
+      </button>
     </motion.div>
   );
 };

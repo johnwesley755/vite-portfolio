@@ -8,6 +8,9 @@ import { EnhancedExperienceSection } from "./components/sections/EnhancedExperie
 import { ContactSection } from "./components/sections/ContactSection";
 import { Footer } from "./components/sections/Footer";
 import { ScrollToTopButton } from "./components/ui/ScrollToTopButton";
+import { VisitorCounter } from "./components/ui/VisitorCounter";
+import { Chatbot } from "./components/ui/Chatbot";
+import IntegrationsSection from "./components/sections/IntegrationsSection";
 
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("hero");
@@ -56,10 +59,14 @@ const Portfolio = () => {
       />
 
       <main>
+        <div className="pt-24 flex justify-center">
+          <VisitorCounter />
+        </div>
         <HeroSection />
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
+        <IntegrationsSection />
         <EnhancedExperienceSection />
         <ContactSection />
       </main>
@@ -70,6 +77,7 @@ const Portfolio = () => {
         showScrollTop={showScrollTop}
         scrollToTop={scrollToTop}
       />
+      <Chatbot />
     </div>
   );
 };
