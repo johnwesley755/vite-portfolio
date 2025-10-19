@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Github,
   Linkedin,
@@ -6,20 +6,19 @@ import {
   Download,
   ChevronRight,
 } from "lucide-react";
-import { portfolioData } from "../../data/portfolio";
-import resumePdf from "../../assets/resume.pdf";
-import modelGlb from "../../../public/models/model.glb";
-// React Three Fiber & Drei
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
 
-// 3D Model Loader - Medium scale for balanced visibility
-function Model({ url }) {
-  const { scene } = useGLTF(url);
-  return <primitive object={scene} scale={0.25} position={[0, -1, 0]} />;
-}
+// Sample portfolio data
+const portfolioData = {
+  personal: {
+    name: "John Wesley",
+    bio: "Full Stack Developer passionate about creating innovative web solutions and bringing ideas to life through code.",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    twitter: "https://twitter.com",
+  },
+};
 
-export const HeroSection = () => {
+export default function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
 
@@ -43,7 +42,7 @@ export const HeroSection = () => {
     const blob = new Blob([resumeContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = resumePdf;
+    a.href = url;
     a.download = "John Wesley.pdf";
     document.body.appendChild(a);
     a.click();
@@ -54,87 +53,94 @@ export const HeroSection = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen bg-black text-white overflow-hidden font-sans max-md:mt-20"
+      className="relative min-h-screen bg-black text-white overflow-hidden font-sans"
     >
-      {/* Background 3D Model Canvas - Full Screen with Interactive Controls */}
-      <div className="absolute inset-0 z-0 mt-40">
-        <Canvas
-          camera={{ position: [0, 0, 18], fov: 35 }}
-          style={{ cursor: "grab" }}
-          onPointerDown={(e) => (e.target.style.cursor = "grabbing")}
-          onPointerUp={(e) => (e.target.style.cursor = "grab")}
-        >
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[5, 5, 5]} intensity={1.2} />
-          <directionalLight position={[-5, -5, -5]} intensity={0.8} />
-          <pointLight position={[0, 10, 5]} intensity={1.5} />
-          <spotLight position={[10, 10, 10]} intensity={1.0} />
-          <Suspense fallback={null}>
-            <Model url={modelGlb} />
-          </Suspense>
-          <OrbitControls
-            enableZoom={true}
-            enablePan={true}
-            enableRotate={true}
-            autoRotate={true}
-            autoRotateSpeed={1.5}
-            enableDamping={true}
-            dampingFactor={0.02}
-            maxDistance={30}
-            minDistance={12}
-            rotateSpeed={1.2}
-            zoomSpeed={1.2}
-            panSpeed={1.0}
-            makeDefault
-          />
-        </Canvas>
+      {/* Enhanced Animated Background with Geometric Shapes */}
+      <div className="absolute inset-0 z-0">
+        {/* Gradient Orbs */}
+        <div
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: "4s" }}
+        />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: "5s", animationDelay: "1s" }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 w-64 h-64 bg-green-400/15 rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: "6s", animationDelay: "2s" }}
+        />
+        
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/75" />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      {/* Enhanced Animated Background */}
+      {/* Interactive Mouse Gradient & Geometric Elements */}
       <div className="absolute inset-0 z-[1]">
         <div
-          className="absolute inset-0 opacity-15 transition-all duration-300"
+          className="absolute inset-0 opacity-20 transition-all duration-300"
           style={{
-            background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(34, 197, 94, 0.3) 0%, rgba(16, 185, 129, 0.15) 30%, transparent 70%)`,
+            background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(34, 197, 94, 0.4) 0%, rgba(16, 185, 129, 0.2) 30%, transparent 70%)`,
           }}
         />
 
-        <div className="absolute top-16 left-8 w-40 h-40 border border-green-500/10 rotate-45 animate-pulse rounded-lg" />
+        {/* Animated Geometric Shapes */}
+        <div className="absolute top-20 left-12 w-40 h-40 border border-green-500/20 rotate-45 animate-pulse rounded-lg" />
         <div
-          className="absolute bottom-20 right-16 w-32 h-32 border-2 border-green-500/15 rounded-full animate-pulse"
+          className="absolute bottom-24 right-20 w-32 h-32 border-2 border-green-500/25 rounded-full animate-pulse"
           style={{ animationDelay: "1s" }}
         />
         <div
-          className="absolute top-1/3 right-1/3 w-3 h-24 bg-gradient-to-b from-green-500/20 to-transparent animate-pulse rounded-full"
+          className="absolute top-1/3 right-1/3 w-4 h-28 bg-gradient-to-b from-green-500/30 to-transparent animate-pulse rounded-full"
           style={{ animationDelay: "2s" }}
         />
         <div
-          className="absolute bottom-1/3 left-1/4 w-20 h-20 border border-green-500/8 rotate-12 animate-pulse"
+          className="absolute bottom-1/3 left-1/4 w-24 h-24 border border-green-500/15 rotate-12 animate-pulse"
           style={{ animationDelay: "3s" }}
         />
-
         <div
-          className="absolute inset-0 opacity-5"
+          className="absolute top-1/4 right-1/4 w-20 h-20 border-2 border-emerald-500/20 rotate-45 animate-pulse rounded-lg"
+          style={{ animationDelay: "1.5s" }}
+        />
+
+        {/* Grid Pattern */}
+        <div
+          className="absolute inset-0 opacity-10"
           style={{
-            backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.15) 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
           }}
         />
 
-        {[...Array(6)].map((_, i) => (
+        {/* Floating Particles */}
+        {[...Array(8)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-green-500/20 rounded-full animate-ping"
+            className="absolute w-2 h-2 bg-green-500/30 rounded-full animate-ping"
             style={{
-              left: `${20 + i * 15}%`,
-              top: `${30 + (i % 3) * 20}%`,
-              animationDelay: `${i * 0.5}s`,
+              left: `${15 + i * 12}%`,
+              top: `${25 + (i % 4) * 20}%`,
+              animationDelay: `${i * 0.6}s`,
               animationDuration: "3s",
             }}
           />
         ))}
+
+        {/* Diagonal Lines */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-px bg-gradient-to-r from-transparent via-green-500 to-transparent w-full"
+              style={{
+                top: `${i * 20}%`,
+                transform: `rotate(-15deg) translateX(-10%)`,
+                animation: `pulse ${3 + i * 0.5}s infinite`,
+                animationDelay: `${i * 0.3}s`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Main Content - Centered */}
@@ -267,4 +273,4 @@ export const HeroSection = () => {
       </div>
     </section>
   );
-};
+}

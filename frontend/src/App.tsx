@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "./components/sections/Header";
-import { HeroSection } from "./components/sections/HeroSection";
+import HeroSection from "./components/sections/HeroSection";
 import { AboutSection } from "./components/sections/AboutSection";
 import { SkillsSection } from "./components/sections/SkillsSection";
 import ProjectsSection from "./components/sections/ProjectsSection";
