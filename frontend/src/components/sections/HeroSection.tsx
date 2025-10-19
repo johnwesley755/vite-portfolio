@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import {
   Github,
   Linkedin,
@@ -6,19 +6,10 @@ import {
   Download,
   ChevronRight,
 } from "lucide-react";
+import { portfolioData } from "../../data/portfolio";
+import resumePdf from "../../assets/resume.pdf";
 
-// Sample portfolio data
-const portfolioData = {
-  personal: {
-    name: "John Wesley",
-    bio: "Full Stack Developer passionate about creating innovative web solutions and bringing ideas to life through code.",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-  },
-};
-
-export default function HeroSection() {
+export const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
 
@@ -42,7 +33,7 @@ export default function HeroSection() {
     const blob = new Blob([resumeContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
+    a.href = resumePdf;
     a.download = "John Wesley.pdf";
     document.body.appendChild(a);
     a.click();
@@ -53,11 +44,11 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen bg-black text-white overflow-hidden font-sans"
+      className="relative min-h-screen bg-black text-white overflow-hidden font-sans max-md:mt-20"
     >
-      {/* Enhanced Animated Background with Geometric Shapes */}
+      {/* Enhanced Animated Background with Multiple Layers */}
       <div className="absolute inset-0 z-0">
-        {/* Gradient Orbs */}
+        {/* Large Gradient Orbs */}
         <div
           className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: "4s" }}
@@ -70,12 +61,16 @@ export default function HeroSection() {
           className="absolute top-1/2 left-1/2 w-64 h-64 bg-green-400/15 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: "6s", animationDelay: "2s" }}
         />
+        <div
+          className="absolute top-3/4 left-1/3 w-72 h-72 bg-emerald-600/15 rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: "7s", animationDelay: "1.5s" }}
+        />
         
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-black/65" />
       </div>
 
-      {/* Interactive Mouse Gradient & Geometric Elements */}
+      {/* Enhanced Animated Background */}
       <div className="absolute inset-0 z-[1]">
         <div
           className="absolute inset-0 opacity-20 transition-all duration-300"
@@ -84,10 +79,10 @@ export default function HeroSection() {
           }}
         />
 
-        {/* Animated Geometric Shapes */}
-        <div className="absolute top-20 left-12 w-40 h-40 border border-green-500/20 rotate-45 animate-pulse rounded-lg" />
+        {/* Enhanced Geometric Shapes */}
+        <div className="absolute top-16 left-8 w-40 h-40 border border-green-500/20 rotate-45 animate-pulse rounded-lg" />
         <div
-          className="absolute bottom-24 right-20 w-32 h-32 border-2 border-green-500/25 rounded-full animate-pulse"
+          className="absolute bottom-20 right-16 w-32 h-32 border-2 border-green-500/25 rounded-full animate-pulse"
           style={{ animationDelay: "1s" }}
         />
         <div
@@ -102,8 +97,16 @@ export default function HeroSection() {
           className="absolute top-1/4 right-1/4 w-20 h-20 border-2 border-emerald-500/20 rotate-45 animate-pulse rounded-lg"
           style={{ animationDelay: "1.5s" }}
         />
+        <div
+          className="absolute bottom-1/2 right-1/3 w-28 h-28 border border-green-400/15 rotate-[30deg] animate-pulse rounded-lg"
+          style={{ animationDelay: "2.5s" }}
+        />
+        <div
+          className="absolute top-2/3 left-1/3 w-16 h-16 border-2 border-emerald-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "3.5s" }}
+        />
 
-        {/* Grid Pattern */}
+        {/* Enhanced Grid Pattern */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -112,28 +115,28 @@ export default function HeroSection() {
           }}
         />
 
-        {/* Floating Particles */}
-        {[...Array(8)].map((_, i) => (
+        {/* More Floating Particles */}
+        {[...Array(12)].map((_, i) => (
           <div
             key={i}
             className="absolute w-2 h-2 bg-green-500/30 rounded-full animate-ping"
             style={{
-              left: `${15 + i * 12}%`,
-              top: `${25 + (i % 4) * 20}%`,
-              animationDelay: `${i * 0.6}s`,
+              left: `${10 + i * 8}%`,
+              top: `${20 + (i % 5) * 15}%`,
+              animationDelay: `${i * 0.5}s`,
               animationDuration: "3s",
             }}
           />
         ))}
 
-        {/* Diagonal Lines */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5">
-          {[...Array(6)].map((_, i) => (
+        {/* Diagonal Lines Overlay */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5 pointer-events-none">
+          {[...Array(8)].map((_, i) => (
             <div
               key={i}
               className="absolute h-px bg-gradient-to-r from-transparent via-green-500 to-transparent w-full"
               style={{
-                top: `${i * 20}%`,
+                top: `${i * 15}%`,
                 transform: `rotate(-15deg) translateX(-10%)`,
                 animation: `pulse ${3 + i * 0.5}s infinite`,
                 animationDelay: `${i * 0.3}s`,
@@ -141,6 +144,10 @@ export default function HeroSection() {
             />
           ))}
         </div>
+
+        {/* Animated Corner Accents */}
+        <div className="absolute top-10 left-10 w-20 h-20 border-l-2 border-t-2 border-green-500/30 animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-20 h-20 border-r-2 border-b-2 border-green-500/30 animate-pulse" style={{ animationDelay: "1s" }} />
       </div>
 
       {/* Main Content - Centered */}
@@ -273,4 +280,4 @@ export default function HeroSection() {
       </div>
     </section>
   );
-}
+};
