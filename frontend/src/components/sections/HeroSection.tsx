@@ -19,7 +19,7 @@ import { Badge } from "../ui/Badge";
 // --- THREE.JS IMPORTS ---
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, useGLTF, PerspectiveCamera, OrbitControls, MeshDistortMaterial, Sphere } from "@react-three/drei";
-const MODEL_PATH = "/models/hologram.glb";
+const MODEL_PATH = "/models/webdev.glb";
 
 // -------------------------------------------------------------------
 // --- TYPE DEFINITIONS AND DATA EXTRACTION ---
@@ -139,7 +139,7 @@ const Hero3DModel: React.FC = () => {
       <primitive
         ref={modelRef}
         object={scene}
-        scale={0.6} 
+        scale={1} 
       />
     </Center>
   );
