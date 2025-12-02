@@ -1,283 +1,479 @@
-import React, { useState, useEffect, Suspense } from "react";
+// src/components/HeroSection.tsx
+import React, { useState, useEffect, Suspense, useRef, Component, ErrorInfo, ReactNode } from "react";
 import {
   Github,
   Linkedin,
   Twitter,
   Download,
   ChevronRight,
+  Code
 } from "lucide-react";
-import { portfolioData } from "../../data/portfolio";
-import resumePdf from "../../assets/resume.pdf";
+import { portfolioData } from "../../data/portfolio"; 
+import { motion } from "framer-motion";
+import * as THREE from 'three'; // Import THREE for ref typing
+import { Center } from "@react-three/drei";
+// Importing UI components (ensure these paths are correct in your project)
+import { Button } from "../ui/Button";
+import { Badge } from "../ui/Badge";
+
+// --- THREE.JS IMPORTS ---
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Environment, useGLTF, PerspectiveCamera, OrbitControls, MeshDistortMaterial, Sphere } from "@react-three/drei";
+const MODEL_PATH = "/models/model (1).glb";
+
+// -------------------------------------------------------------------
+// --- TYPE DEFINITIONS AND DATA EXTRACTION ---
+// -------------------------------------------------------------------
+interface PersonalData {
+  name: string;
+  title: string;
+  bio: string;
+  resume: string;
+  github: string;
+  linkedin: string;
+  twitter: string;
+}
+const data = portfolioData as { personal: PersonalData };
+const typedPortfolioData = data.personal;
+
+const nameParts = typedPortfolioData.name.split(" ");
+const firstName = nameParts.length > 0 ? nameParts[0] : "";
+const lastName = nameParts.slice(1).join(" ");
+
+
+// -------------------------------------------------------------------
+// --- SVG BACKGROUND DATA URI & STYLE ---
+// -------------------------------------------------------------------
+// The provided SVG content encoded for use in Tailwind CSS/CSS background
+const SVG_WAVE_PATTERN = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' viewBox='0 0 1000 120'><rect fill='%23000000' width='1000' height='120'/><g fill='none' stroke='%23222' stroke-width='10' stroke-opacity='1'><path d='M-500 75c0 0 125-30 250-30S0 75 0 75s125 30 250 30s250-30 250-30s125-30 250-30s250 30 250 30s125 30 250 30s250-30 250-30'/><path d='M-500 45c0 0 125-30 250-30S0 45 0 45s125 30 250 30s250-30 250-30s125-30 250-30s250 30 250 30s125 30 250 30s250-30 250-30'/><path d='M-500 105c0 0 125-30 250-30S0 105 0 105s125 30 250 30s250-30 250-30s125-30 250-30s250 30 250 30s125 30 250 30s250-30 250-30'/><path d='M-500 15c0 0 125-30 250-30S0 15 0 15s125 30 250 30s250-30 250-30s125-30 250-30s250 30 250 30s125 30 250 30s250-30 250-30'/><path d='M-500-15c0 0 125-30 250-30S0-15 0-15s125 30 250 30s250-30 250-30s125-30 250-30s250 30 250 30s125 30 250 30s250-30 250-30'/><path d='M-500 135c0 0 125-30 250-30S0 135 0 135s125 30 250 30s250-30 250-30s125-30 250-30s250 30 250 30s125 30 250 30s250-30 250-30'/></g></svg>`;
+const SVG_STYLE = {
+    backgroundImage: `url("${SVG_WAVE_PATTERN}")`,
+    backgroundSize: '100% 120px', // Stretch width, maintain original height
+    backgroundRepeat: 'repeat-y', // Repeat vertically
+};
+
+
+// -------------------------------------------------------------------
+// --- 3D MODEL COMPONENTS AND ERROR HANDLING ---
+// -------------------------------------------------------------------
+
+// Animation variants for the content
+const fadeUpVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1,
+      delay: 0.5 + i * 0.2,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  }),
+};
+
+// --- Error Boundary Component (Self-Contained) ---
+interface ErrorBoundaryProps { children: ReactNode; }
+interface ErrorBoundaryState { hasError: boolean; }
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = { hasError: false };
+
+  public static getDerivedStateFromError(_: Error): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Uncaught error in Three.js Canvas:", error, errorInfo);
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex justify-center items-center h-full text-red-400 bg-black/50 p-8">
+          <p className="text-center text-lg font-semibold border border-red-500/50 p-4 rounded-lg bg-red-900/10 backdrop-blur-sm">
+            ❌ **Model Failed to Load.** <br />
+            Please check if "{MODEL_PATH}" is accessible.
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// --- Animated 3D Model Component ---
+const Hero3DModel: React.FC = () => {
+  const modelRef = useRef<THREE.Group>(null);
+  const { scene } = useGLTF(MODEL_PATH);
+  
+  // State to check if we are on a large screen
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)'); // Tailwind's 'lg' breakpoint
+    const handleResize = () => setIsLargeScreen(mediaQuery.matches);
+    
+    // Initial check
+    handleResize(); 
+    
+    // Listen for changes
+    mediaQuery.addListener(handleResize);
+    return () => mediaQuery.removeListener(handleResize);
+  }, []);
+  
+  // Determine position based on screen size
+  // Desktop (lg:) offset 5 units right for the right column layout
+  // Mobile: 0 offset to keep it centered in the single column
+  const modelPosition: [number, number, number] = isLargeScreen ? [5, 0, 0] : [0, 0, 0];
+
+
+  useFrame((state) => {
+    if (modelRef.current) {
+      // Gentle horizontal rotation
+      modelRef.current.rotation.y = state.clock.elapsedTime * 0.2;
+      // Gentle floating animation (maintaining the user's base position)
+      modelRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.08; 
+    }
+  });
+
+  return (
+    // Responsive position for the model
+    <Center position={modelPosition}> 
+      <primitive
+        ref={modelRef}
+        object={scene.clone()}
+        scale={0.6} 
+      />
+    </Center>
+  );
+};
+
+// --- Blob Component for Background ---
+interface BlobProps {
+  position: [number, number, number];
+  scale: number;
+  color: string;
+  speed: number;
+  distort: number;
+  rotationSpeed?: number;
+}
+
+const Blob: React.FC<BlobProps> = ({ position, scale, color, speed, distort, rotationSpeed = 0.5 }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      // Gentle rotation
+      meshRef.current.rotation.x = meshRef.current.rotation.y = meshRef.current.rotation.z += 0.005 * rotationSpeed;
+      // Gentle floating
+      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed) * 0.5;
+    }
+  });
+
+  return (
+    <Sphere args={[1, 64, 64]} position={position} scale={scale} ref={meshRef}>
+      <MeshDistortMaterial
+        color={color}
+        distort={distort} // How much the sphere is "distorted"
+        speed={speed} // Speed of distortion animation
+        roughness={0.5}
+        metalness={0.5}
+      />
+    </Sphere>
+  );
+};
+
+// --- Logo Component ---
+const Logo: React.FC = () => (
+    <div className="flex items-center space-x-2 text-white font-black text-xl md:text-2xl tracking-widest cursor-default">
+        <Code className="h-6 w-6 text-gray-400" />
+        <span className="hidden sm:inline">{firstName}</span>
+        <span className="hidden sm:inline text-gray-400">{lastName}</span>
+        <span className="sm:hidden">{firstName[0]}{lastName[0]}</span> {/* Initials for small screens */}
+    </div>
+);
+
+// -------------------------------------------------------------------
+// --- HEADER COMPONENT ---
+// -------------------------------------------------------------------
+const Header: React.FC<{ onDownload: () => void }> = ({ onDownload }) => (
+    <header className="absolute top-0 left-0 w-full z-30 p-4 md:p-6 backdrop-blur-sm bg-black/10">
+        <div className="flex justify-between items-center mx-auto max-w-7xl">
+            <Logo />
+            <Button
+                onClick={onDownload}
+                variant="outline"
+                size="sm"
+                className="group px-4 py-2.5 text-xs md:text-sm font-bold text-white border-2 border-white/20 hover:border-white transition-all duration-300 backdrop-blur-xl bg-white/5 hover:bg-white/10"
+            >
+                <Download className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+                VIEW RESUME
+            </Button>
+        </div>
+    </header>
+);
+
+// -------------------------------------------------------------------
+// --- HERO SECTION MAIN COMPONENT ---
+// -------------------------------------------------------------------
 
 export const HeroSection = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
-
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Function to handle resume download
   const handleDownload = () => {
-    const resumeContent = "This is a placeholder for resume.";
-    const blob = new Blob([resumeContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = resumePdf;
-    a.download = "John Wesley.pdf";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    if (typedPortfolioData.resume) {
+      const link = document.createElement("a");
+      link.href = typedPortfolioData.resume;
+      link.download = `${firstName}_${lastName}_Resume.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error("Resume path not found in portfolioData.");
+    }
   };
 
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen bg-black text-white overflow-hidden font-sans max-md:mt-20"
-    >
-      {/* Enhanced Animated Background with Multiple Layers */}
+    // Outer container for full-screen layout
+    <div className="relative min-h-screen bg-black overflow-hidden">
+      
+      {/* GLOBAL HEADER (Z-30) */}
+      <Header onDownload={handleDownload} />
+
+      {/* 0. SVG WAVE PATTERN BACKGROUND (Z-0) - Furthest Back Layer */}
+      <div className="absolute inset-0 z-0 opacity-20" style={SVG_STYLE} />
+
+      {/* 1. 3D Model Canvas (Z-0) - Renders transparently over the SVG */}
       <div className="absolute inset-0 z-0">
-        {/* Large Gradient Orbs */}
-        <div
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: "4s" }}
-        />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: "5s", animationDelay: "1s" }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 w-64 h-64 bg-green-400/15 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: "6s", animationDelay: "2s" }}
-        />
-        <div
-          className="absolute top-3/4 left-1/3 w-72 h-72 bg-emerald-600/15 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: "7s", animationDelay: "1.5s" }}
-        />
-        
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/65" />
-      </div>
-
-      {/* Enhanced Animated Background */}
-      <div className="absolute inset-0 z-[1]">
-        <div
-          className="absolute inset-0 opacity-20 transition-all duration-300"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(34, 197, 94, 0.4) 0%, rgba(16, 185, 129, 0.2) 30%, transparent 70%)`,
-          }}
-        />
-
-        {/* Enhanced Geometric Shapes */}
-        <div className="absolute top-16 left-8 w-40 h-40 border border-green-500/20 rotate-45 animate-pulse rounded-lg" />
-        <div
-          className="absolute bottom-20 right-16 w-32 h-32 border-2 border-green-500/25 rounded-full animate-pulse"
-          style={{ animationDelay: "1s" }}
-        />
-        <div
-          className="absolute top-1/3 right-1/3 w-4 h-28 bg-gradient-to-b from-green-500/30 to-transparent animate-pulse rounded-full"
-          style={{ animationDelay: "2s" }}
-        />
-        <div
-          className="absolute bottom-1/3 left-1/4 w-24 h-24 border border-green-500/15 rotate-12 animate-pulse"
-          style={{ animationDelay: "3s" }}
-        />
-        <div
-          className="absolute top-1/4 right-1/4 w-20 h-20 border-2 border-emerald-500/20 rotate-45 animate-pulse rounded-lg"
-          style={{ animationDelay: "1.5s" }}
-        />
-        <div
-          className="absolute bottom-1/2 right-1/3 w-28 h-28 border border-green-400/15 rotate-[30deg] animate-pulse rounded-lg"
-          style={{ animationDelay: "2.5s" }}
-        />
-        <div
-          className="absolute top-2/3 left-1/3 w-16 h-16 border-2 border-emerald-400/20 rounded-full animate-pulse"
-          style={{ animationDelay: "3.5s" }}
-        />
-
-        {/* Enhanced Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.15) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
-
-        {/* More Floating Particles */}
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-green-500/30 rounded-full animate-ping"
-            style={{
-              left: `${10 + i * 8}%`,
-              top: `${20 + (i % 5) * 15}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: "3s",
-            }}
-          />
-        ))}
-
-        {/* Diagonal Lines Overlay */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5 pointer-events-none">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute h-px bg-gradient-to-r from-transparent via-green-500 to-transparent w-full"
-              style={{
-                top: `${i * 15}%`,
-                transform: `rotate(-15deg) translateX(-10%)`,
-                animation: `pulse ${3 + i * 0.5}s infinite`,
-                animationDelay: `${i * 0.3}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Animated Corner Accents */}
-        <div className="absolute top-10 left-10 w-20 h-20 border-l-2 border-t-2 border-green-500/30 animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-20 h-20 border-r-2 border-b-2 border-green-500/30 animate-pulse" style={{ animationDelay: "1s" }} />
-      </div>
-
-      {/* Main Content - Centered */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen py-20">
-        <div className="container mx-auto px-6 lg:px-12 xl:px-16">
-          <div className="flex flex-col items-center justify-center text-center">
-            {/* Centered Content */}
-            <div
-              className={`max-w-4xl space-y-7 transition-all duration-1000 ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
-              }`}
+        <ErrorBoundary>
+            <Canvas 
+              shadows 
+              dpr={[1, 2]} 
+              gl={{ alpha: true, antialias: true }}
+              className="bg-transparent" 
             >
+              <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={25} /> 
+              
+              {/* 💡 LIGHTING - Reduced for a darker, moodier effect */}
+              <ambientLight intensity={0.1} /> 
+              <directionalLight position={[5, 10, 5]} intensity={0.2} castShadow />
+              
+              {/* Blobs in the background */}
+              <Suspense fallback={null}>
+                <Blob position={[13, 5, -15]} scale={3} color="#2F004F" speed={1.5} distort={0.6} rotationSpeed={0.7} />
+                <Blob position={[-5, -7, -18]} scale={4} color="#003D4D" speed={1.2} distort={0.7} rotationSpeed={0.5} />
+                <Blob position={[5, 10, -20]} scale={2.5} color="#4F002F" speed={1.8} distort={0.5} rotationSpeed={0.9} />
+                <Blob position={[17, -3, -12]} scale={2} color="#1A0033" speed={1.0} distort={0.8} rotationSpeed={0.4} />
+              </Suspense>
+
+              <Suspense fallback={null}> 
+                  <Hero3DModel />
+              </Suspense>
+              
+              {/* Controls - Allows user interaction in the background */}
+              <OrbitControls
+                enableZoom={false}
+                enablePan={false}
+                minPolarAngle={Math.PI / 6}
+                maxPolarAngle={Math.PI / 1.8}
+                autoRotate
+                autoRotateSpeed={0.8}
+                maxDistance={20} 
+                minDistance={15}
+              />
+              
+              {/* Environment Lighting - SIGNIFICANTLY REDUCED INTENSITY */}
+              <Environment preset="sunset" intensity={0.1} /> 
+            </Canvas>
+        </ErrorBoundary>
+      </div>
+      
+      {/* 2. Background Overlay for visual effect (Z-10) */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        
+        {/* REMOVED: Grid pattern div */}
+
+        {/* Subtle radial fade to focus on the content columns */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.8)_100%)]" />
+        <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
+      </div>
+
+
+      {/* 3. Main Portfolio Content Section (Z-20) */}
+      <section 
+        id="hero-content" 
+        className="font-['Poppins'] relative z-20 w-full min-h-screen flex items-center px-4 pt-32 pb-24"
+      >
+        {/* Adjusted the main content alignment container for desktop, keeping mobile centered/full width */}
+        <div className="mx-auto w-full max-w-6xl lg:ml-20"> 
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            
+            {/* COLUMN 1: Text Content (Left Side - Mobile Top) */}
+            <div className="relative z-10 text-center lg:text-left">
               <div className="space-y-4">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-12 h-px bg-gradient-to-r from-transparent via-green-500 to-transparent" />
-                  <p className="text-sm md:text-base text-green-400 font-medium tracking-[0.2em] uppercase">
-                    Hello, I'm
-                  </p>
-                  <div className="w-12 h-px bg-gradient-to-r from-transparent via-green-500 to-transparent" />
-                </div>
-
-                {/* Name - Medium sized */}
-                <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight tracking-tight">
-                  <span className="bg-gradient-to-r from-white via-green-100 to-gray-300 bg-clip-text text-transparent">
-                    {portfolioData.personal.name.split(" ")[0]}
-                  </span>
-                  <span className="bg-gradient-to-r from-green-400 via-green-500 to-emerald-400 bg-clip-text text-transparent ml-4">
-                    {portfolioData.personal.name.split(" ")[1]}
-                  </span>
-                  <span
-                    className="inline-block ml-3 text-2xl md:text-4xl lg:text-5xl animate-bounce"
-                    style={{ animationDelay: "2s" }}
-                  >
-                    👋
-                  </span>
-                </h1>
-
-                <div className="flex items-center justify-center gap-4">
-                  <div className="w-16 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent rounded-full" />
-                  <div className="w-8 h-1 bg-green-500/50 rounded-full" />
-                  <div className="w-16 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent rounded-full" />
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <p className="text-base md:text-lg lg:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed font-light backdrop-blur-sm bg-black/30 rounded-2xl p-5 border border-white/10">
-                  {portfolioData.personal.bio}
-                </p>
-
-                <div className="flex items-center justify-center gap-6 text-gray-300">
-                  <div className="flex items-center gap-2 backdrop-blur-sm bg-black/30 rounded-full px-5 py-2 border border-white/10">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-sm md:text-base">
-                      Available for opportunities
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
-                <button className="group relative inline-flex items-center justify-center px-9 py-4 text-base font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 rounded-xl text-black transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <a
-                    href="#project"
-                    className="relative z-10 flex items-center"
-                  >
-                    VIEW PROJECTS
-                    <ChevronRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </a>
-                </button>
-
-                <button
-                  onClick={handleDownload}
-                  className="group relative inline-flex items-center justify-center px-9 py-4 text-base font-bold text-white border-2 border-gray-600 hover:border-green-500 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-500/10 overflow-hidden backdrop-blur-sm bg-black/30"
+                
+                {/* Badge */}
+                <motion.div
+                  custom={0.5}
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex justify-center lg:justify-start"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative z-10 flex items-center">
-                    <Download className="mr-2 h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1" />
-                    DOWNLOAD RESUME
-                  </span>
-                </button>
-              </div>
-
-              <div className="flex items-center justify-center space-x-6 pt-7">
-                {[
-                  {
-                    icon: Github,
-                    href: portfolioData.personal.github,
-                    label: "GitHub",
-                  },
-                  {
-                    icon: Linkedin,
-                    href: portfolioData.personal.linkedin,
-                    label: "LinkedIn",
-                  },
-                  {
-                    icon: Twitter,
-                    href: portfolioData.personal.twitter,
-                    label: "Twitter",
-                  },
-                ].map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative p-3 rounded-xl border border-gray-600/50 hover:border-green-500/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-500/20 backdrop-blur-sm bg-black/30 hover:bg-black/40"
-                    title={social.label}
+                  <Badge 
+                    variant="outline" 
+                    className="px-6 py-2.5 text-[11px] font-bold tracking-[0.15em] uppercase bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-300 rounded-full shadow-lg"
                   >
-                    <social.icon className="h-6 w-6 text-gray-300 group-hover:text-green-500 transition-colors duration-300" />
-                    <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-300" />
-                  </a>
-                ))}
-              </div>
-
-              {/* Status indicator */}
-              <div className="flex items-center justify-center pt-5">
-                <div className="flex items-center gap-3 px-7 py-3 bg-gradient-to-r from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-2xl shadow-xl backdrop-blur-md">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-base text-gray-200 font-medium">
+                    <span className="relative flex h-2 w-2 mr-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                    </span>
                     Available for work
+                  </Badge>
+                </motion.div>
+
+                {/* Title 1: Name */}
+                <motion.h1
+                  custom={1}
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight tracking-tight whitespace-nowrap"
+                >
+                  <span className="text-white drop-shadow-[0_0_60px_rgba(255,255,255,0.25)]">
+                    {firstName} <span className="text-gray-400">{lastName}</span>
                   </span>
-                </div>
+                </motion.h1>
+
+                {/* Title 2: Role/Title */}
+                <motion.h2
+                  custom={1.5}
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-300/90 leading-tight tracking-wide"
+                >
+                  {typedPortfolioData.title}
+                </motion.h2>
+
+                {/* Bio */}
+                <motion.div
+                  custom={2}
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="pt-2" 
+                >
+                  <p 
+                    className="text-base sm:text-lg lg:text-xl text-gray-400/90 leading-relaxed font-normal tracking-wide max-w-4xl mx-auto lg:mx-0"
+                  >
+                    {typedPortfolioData.bio}
+                  </p>
+                </motion.div>
+
+                {/* Buttons */}
+                <motion.div
+                  custom={3}
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-6" 
+                >
+                  {/* VIEW PROJECTS - Primary Button */}
+                  <Button 
+                    asChild
+                    size="lg"
+                    className="group relative px-7 py-5 text-base font-bold bg-white text-black hover:bg-gray-100 transition-all duration-300 hover:scale-[1.02] shadow-2xl overflow-hidden border-0"
+                  >
+                    <a href="#projects" className="flex items-center gap-2">
+                      VIEW PROJECTS
+                      <ChevronRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </a>
+                  </Button>
+
+                  {/* DOWNLOAD RESUME - Secondary Button */}
+                   <Button
+                    onClick={handleDownload}
+                    variant="outline"
+                    size="lg"
+                    className="group relative px-7 py-5 text-base font-bold text-white border-2 border-white/20 hover:border-white transition-all duration-300 hover:scale-[1.02] shadow-xl backdrop-blur-xl bg-white/5 hover:bg-white/10"
+                  >
+                    <Download className="mr-2 h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5" />
+                    DOWNLOAD RESUME
+                  </Button>
+                </motion.div>
+
+                {/* Social Links */}
+                <motion.div
+                  custom={4}
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex items-center justify-center lg:justify-start gap-3 pt-6"
+                >
+                  {[
+                    {
+                      icon: Github,
+                      href: typedPortfolioData.github,
+                      label: "GitHub",
+                    },
+                    {
+                      icon: Linkedin,
+                      href: typedPortfolioData.linkedin,
+                      label: "LinkedIn",
+                    },
+                    {
+                      icon: Twitter,
+                      href: typedPortfolioData.twitter,
+                      label: "Twitter",
+                    },
+                  ].map((social, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="icon"
+                      asChild
+                      className="h-12 w-12 rounded-full border-2 border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-xl bg-white/5 hover:bg-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.25)]"
+                    >
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={social.label}
+                      >
+                        <social.icon className="h-5 w-5 text-gray-300 group-hover:text-white transition-colors duration-300" />
+                      </a>
+                    </Button>
+                  ))}
+                </motion.div>
               </div>
             </div>
+
+            {/* COLUMN 2: 3D Model Visual Anchor (Right Side/Mobile Bottom) */}
+            <div className="h-[300px] w-full relative z-10 pointer-events-none lg:h-[500px] mt-8 lg:mt-0">
+            </div>
+
           </div>
         </div>
+      </section>
+
+      {/* Interaction hint (Z-20) */}
+      <div className="absolute bottom-12 right-1/2 translate-x-1/2 lg:right-12 lg:-translate-x-0 z-20">
+        <div className="bg-zinc-900/90 backdrop-blur-md border border-zinc-700 rounded-full px-6 py-3 shadow-2xl">
+          <p className="text-zinc-300 text-sm font-medium flex items-center gap-3">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-400"></span>
+            </span>
+            Drag to explore 3D
+          </p>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };

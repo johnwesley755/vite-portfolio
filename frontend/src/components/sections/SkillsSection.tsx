@@ -1,464 +1,312 @@
-import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import {
-  Code2,
-  Palette,
-  Server,
-  Database,
-  Wrench,
-  Smartphone,
-  Cloud,
-  GitBranch,
-  Monitor,
-  Layers,
-  Sparkles,
-  Zap,
-} from "lucide-react";
-import { portfolioData } from "../../data/portfolio";
-import { useInteraction } from "../../lib/interaction-context";
+import React, { useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from '@react-three/drei';
+import { Badge } from '../ui/badge';
+import { Card, CardContent } from '../ui/Card';
+import * as THREE from 'three';
+import { GlowingEffect } from '../ui/glowing-effect'; 
 
-// Background with Modern Geometric Shapes
-const EnhancedBackgroundShapes = () => {
+// 3D Background Model - LARGER SI
+const SkillsModel = () => {
+  const modelRef = useRef(null);
+  const { scene } = useGLTF('/models/glass-hologram.glb');
+
+  useFrame((state) => {
+    if (modelRef.current) {
+      modelRef.current.rotation.y = state.clock.elapsedTime * 0.1;
+      modelRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.15;
+    }
+  });
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Gradient Orbs */}
-      <motion.div
-        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(20, 184, 166, 0.3) 0%, rgba(147, 51, 234, 0.1) 50%, transparent 70%)",
-        }}
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.2, 0.3, 0.2],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      <motion.div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full opacity-15 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(59, 130, 246, 0.2) 50%, transparent 70%)",
-        }}
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.15, 0.25, 0.15],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Modern geometric shapes */}
-      <div className="absolute top-32 right-32 w-72 h-72 opacity-10">
-        <svg viewBox="0 0 200 200" className="w-full h-full">
-          <defs>
-            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="white" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="white" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-          <polygon
-            points="100,20 170,60 170,140 100,180 30,140 30,60"
-            fill="url(#grad1)"
-          />
-          <polygon
-            points="100,40 150,70 150,130 100,160 50,130 50,70"
-            fill="none"
-            stroke="white"
-            strokeWidth="1"
-            opacity="0.3"
-          />
-        </svg>
-      </div>
-
-      <div className="absolute bottom-40 left-32 w-64 h-64 opacity-8">
-        <svg viewBox="0 0 200 200" className="w-full h-full">
-          <defs>
-            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="white" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="white" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-          <rect
-            x="40"
-            y="40"
-            width="40"
-            height="40"
-            fill="url(#grad2)"
-            transform="rotate(45 60 60)"
-          />
-          <rect
-            x="80"
-            y="80"
-            width="60"
-            height="60"
-            fill="none"
-            stroke="white"
-            strokeWidth="1"
-            opacity="0.3"
-            transform="rotate(45 110 110)"
-          />
-        </svg>
-      </div>
-
-      {/* Floating particles */}
-      {[...Array(12)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 bg-white rounded-full opacity-20"
-          animate={{
-            y: [0, -60, 0],
-            x: [0, Math.sin(i) * 30, 0],
-            opacity: [0.2, 0.6, 0.2],
-            scale: [0.8, 1.2, 0.8],
-          }}
-          transition={{
-            duration: 6 + i * 0.5,
-            repeat: Infinity,
-            delay: i * 0.8,
-            ease: "easeInOut",
-          }}
-          style={{
-            left: `${10 + i * 7}%`,
-            top: `${20 + Math.sin(i * 2) * 30}%`,
-          }}
-        />
-      ))}
-
-      {/* Grid overlay */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: "50px 50px",
-          }}
-        />
-      </div>
-    </div>
+    <primitive 
+      ref={modelRef} 
+      object={scene} 
+      scale={10} 
+      position={[0, 0, 0]} 
+    />
   );
 };
 
-// Skill Badge Component
-const EnhancedSkillBadge = ({ skill, delay = 0 }) => {
-  const { setSelectedSkill } = useInteraction();
+// Skills data with ALL icons preserved
+const skillsData = [
+  { 
+    name: "Python", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+    color: "#3776AB" 
+  },
+  { 
+    name: "Django", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/django/django-plain-wordmark.svg",
+    color: "#FFFFFF" 
+  },
+  { 
+    name: "React", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+    color: "#61DAFB" 
+  },
+  { 
+    name: "Docker", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+    color: "#2496ED" 
+  },
+  { 
+    name: "MySQL", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+    color: "#4479A1" 
+  },
+  { 
+    name: "MongoDB", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+    color: "#47A248" 
+  },
+  { 
+    name: "TypeScript", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+    color: "#3178C6" 
+  },
+  { 
+    name: "Flutter", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flutter/flutter-original.svg",
+    color: "#02569B" 
+  },
+  { 
+    name: "WebRTC", 
+    logo: "https://webrtc.github.io/webrtc-org/assets/images/webrtc-logo-vert-retro-255x305.png",
+    color: "#333333" 
+  },
+  { 
+    name: "JavaScript", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+    color: "#F7DF1E" 
+  },
+  { 
+    name: "Gemini API", 
+    logo: "https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg",
+    color: "#4285F4" 
+  },
+  { 
+    name: "Socket.io", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/socketio/socketio-original-wordmark.svg",
+    color: "#FFFFFF" 
+  },
+  { 
+    name: "Node.js", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+    color: "#339933" 
+  },
+  { 
+    name: "Firebase", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg",
+    color: "#FFCA28" 
+  },
+  { 
+    name: "FastAPI", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
+    color: "#009688" 
+  },
+  { 
+    name: "Tailwind CSS", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
+    color: "#06B6D4" 
+  },
+  { 
+    name: "HTML5", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+    color: "#E34F26" 
+  },
+  { 
+    name: "CSS3", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+    color: "#1572B6" 
+  },
+  { 
+    name: "Express", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original-wordmark.svg",
+    color: "#FFFFFF" 
+  },
+  { 
+    name: "Flask", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flask/flask-original-wordmark.svg",
+    color: "#FFFFFF" 
+  },
+  { 
+    name: "TensorFlow", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg",
+    color: "#FF6F00" 
+  },
+  { 
+    name: "Supabase", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/supabase/supabase-original.svg",
+    color: "#3ECF8E" 
+  },
+  { 
+    name: "Git", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+    color: "#F05032" 
+  },
+  { 
+    name: "GitHub", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original-wordmark.svg",
+    color: "#FFFFFF" 
+  },
+  { 
+    name: "VS Code", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+    color: "#007ACC" 
+  },
+  { 
+    name: "Figma", 
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
+    color: "#F24E1E" 
+  },
+  { 
+    name: "EasyOCR", 
+    logo: "https://raw.githubusercontent.com/JaidedAI/EasyOCR/master/examples/easyocr_framework.jpeg",
+    color: "#FF6B6B" 
+  },
+  { 
+    name: "Shadcn UI", 
+    logo: "https://ui.shadcn.com/apple-touch-icon.png",
+    color: "#000000" 
+  },
+];
+
+const SkillsSection = () => {
   return (
-    <motion.div
-      className="group relative"
-      initial={{ opacity: 0, y: 30, scale: 0.8 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{
-        delay,
-        duration: 0.6,
-        type: "spring",
-        stiffness: 200,
-        damping: 20,
-      }}
-      whileHover={{
-        scale: 1.05,
-        y: -5,
-        transition: { type: "spring", stiffness: 400, damping: 25 },
-      }}
-    >
-      <button onClick={() => setSelectedSkill(skill.name)} className="w-full text-left">
-      <div className="relative p-4 bg-black/70 border border-gray-700/40 rounded-2xl backdrop-blur-sm group-hover:border-teal-500/60 transition-all duration-500 overflow-hidden">
-        <div className="relative flex items-center gap-4">
-          <div className="relative flex-shrink-0">
-            <div className="w-14 h-14 p-2.5 bg-gray-950/80 rounded-xl group-hover:bg-gray-900/80 transition-all duration-300 shadow-lg flex items-center justify-center">
-              <img
-                src={skill.icon}
-                alt={skill.name}
-                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 filter drop-shadow-sm"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  (target.nextElementSibling as HTMLElement).style.display =
-                    "flex";
-                }}
-              />
-              <div className="w-full h-full bg-gray-800 rounded-lg hidden items-center justify-center shadow-inner">
-                <Code2 className="w-6 h-6 text-gray-300" />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1">
-            <h4 className="text-white font-semibold text-lg group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-teal-400 group-hover:bg-clip-text transition-colors duration-300">
-              {skill.name}
-            </h4>
-          </div>
-        </div>
-
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl" />
-      </div>
-      </button>
-    </motion.div>
-  );
-};
-
-// Category Box Component
-const EnhancedCategoryBox = ({ category, skills, icon, delay = 0 }) => {
-  return (
-    <motion.div
-      className="group relative"
-      initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{
-        delay,
-        duration: 0.8,
-        type: "spring",
-        stiffness: 100,
-        damping: 25,
-      }}
-      whileHover={{
-        y: -8,
-        transition: { type: "spring", stiffness: 400, damping: 25 },
-      }}
-    >
-      <div className="relative h-full p-8 bg-gray-950/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl group-hover:border-teal-500/70 transition-all duration-700 overflow-hidden shadow-2xl">
-        <div className="relative">
-          <div className="flex items-center gap-5 mb-8">
-            <div className="relative p-4 bg-gray-900/80 rounded-2xl group-hover:bg-teal-900/50 transition-all duration-500 shadow-lg">
-              <div className="text-teal-400 group-hover:text-green-300 group-hover:scale-110 transition-all duration-300">
-                {icon}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-3xl font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-teal-400 group-hover:bg-clip-text transition-colors duration-300">
-                {category}
-              </h3>
-              <div className="text-sm text-gray-400 font-medium bg-gray-900/50 px-3 py-1 rounded-full inline-block border border-gray-700/50">
-                {skills.length}{" "}
-                {skills.length === 1 ? "Technology" : "Technologies"}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {skills.map((skill, index) => (
-              <EnhancedSkillBadge
-                key={skill.name}
-                skill={skill}
-                delay={delay + index * 0.08}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1200 rounded-3xl" />
-      </div>
-    </motion.div>
-  );
-};
-
-// Main Skills Section Component
-export const SkillsSection = () => {
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
-
-  const categoryIcons: { [key: string]: React.ReactElement } = {
-    Frontend: <Monitor className="w-10 h-10" />,
-    Backend: <Server className="w-10 h-10" />,
-    Database: <Database className="w-10 h-10" />,
-    Tools: <Wrench className="w-10 h-10" />,
-    Mobile: <Smartphone className="w-10 h-10" />,
-    Cloud: <Cloud className="w-10 h-10" />,
-    DevOps: <GitBranch className="w-10 h-10" />,
-    Design: <Palette className="w-10 h-10" />,
-    Framework: <Layers className="w-10 h-10" />,
-    Language: <Code2 className="w-10 h-10" />,
-  };
-
-  const skillCategories = React.useMemo(() => {
-    if (!portfolioData.skills) return [];
-
-    return Object.entries(portfolioData.skills)
-      .filter(([_, data]) => data.items && Array.isArray(data.items))
-      .map(([category, data]) => ({
-        category,
-        skills: data.items,
-        icon: categoryIcons[category] || <Code2 className="w-10 h-10" />,
-      }));
-  }, []);
-
-  const totalSkills = skillCategories.reduce(
-    (total, cat) => total + cat.skills.length,
-    0
-  );
-
-  return (
-    <section
-      ref={sectionRef}
-      id="skills"
-      className="relative min-h-screen py-20 px-4 bg-gradient-to-br from-black via-gray-950 to-black overflow-hidden font-sans"
-    >
-      <div className="absolute inset-0">
-        <EnhancedBackgroundShapes />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-teal-950/10 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-green-950/5 to-transparent" />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto">
-        <motion.div
-          className="text-center mb-20"
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1 }}
+    <section className="relative w-full min-h-screen bg-black overflow-hidden py-20 lg:py-32">
+      {/* 3D Model Background - MUCH LARGER AND MORE VISIBLE */}
+      <div className="absolute inset-0 w-full h-full mt-80">
+        <Canvas 
+          shadows 
+          dpr={[1, 2]} 
+          gl={{ alpha: true, antialias: true }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.25 }}
         >
-          <motion.div
-            className="inline-block mb-8"
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
-            transition={{ delay: 0.2, duration: 0.8, type: "spring" }}
-            whileHover={{ scale: 1.05 }}
-          >
-            <span className="inline-flex items-center gap-3 px-6 py-3 bg-gray-950/90 border border-gray-700/60 rounded-full text-gray-300 text-sm font-bold tracking-wide backdrop-blur-sm shadow-lg">
-              <Sparkles className="w-4 h-4 text-teal-400" />
-              TECHNICAL EXPERTISE
-              <div className="w-2 h-2 bg-green-400 rounded-full shadow-lg shadow-green-400/50" />
+          <PerspectiveCamera makeDefault position={[0, 0, 6]} fov={60} />
+          
+          {/* BRIGHTER Lighting for background model */}
+          <ambientLight intensity={3} />
+          <directionalLight position={[10, 10, 10]} intensity={4} color="#ffffff" />
+          <directionalLight position={[-10, 10, -10]} intensity={3.5} color="#ffffff" />
+          <directionalLight position={[0, -10, 5]} intensity={3} color="#ffffff" />
+          <spotLight position={[0, 15, 0]} angle={0.8} penumbra={1} intensity={4} color="#ffffff" />
+          <pointLight position={[8, 8, 8]} intensity={3} color="#60a5fa" />
+          <pointLight position={[-8, -8, 8]} intensity={3} color="#a855f7" />
+          <pointLight position={[0, -8, -8]} intensity={2.5} color="#ec4899" />
+          
+          <SkillsModel />
+          
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={0.8}
+            minPolarAngle={Math.PI / 3}
+            maxPolarAngle={Math.PI / 1.5}
+          />
+          
+          <Environment preset="city" intensity={2} />
+        </Canvas>
+      </div>
+
+      {/* Foreground Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-20">
+          <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all duration-300 text-xs uppercase tracking-wider px-4 py-1.5 mb-6">
+            Skills & Experience
+          </Badge>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            Working with Latest
+            <br />
+            <span className="text-white">
+              Technologies & Stack
             </span>
-          </motion.div>
-
-          {/* UPDATED: Heading is now on a single line */}
-          <motion.h2
-            className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight tracking-tight"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{
-              delay: 0.3,
-              duration: 1,
-              type: "spring",
-              stiffness: 120,
-            }}
-          >
-            <span className="text-white">Skills & </span>
-            <span className="bg-gradient-to-r from-green-400 via-teal-400 to-green-400 bg-clip-text text-transparent">
-              Technologies
-            </span>
-          </motion.h2>
-
-          <motion.p
-            className="text-lg md:text-xl text-gray-400 max-w-4xl mx-auto leading-relaxed font-light mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            A comprehensive arsenal of cutting-edge technologies and tools that
-            I leverage to craft exceptional digital experiences and build
-            scalable, high-performance solutions.
-          </motion.p>
-
-          <motion.div
-            className="flex items-center justify-center gap-8 mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.7, duration: 0.8 }}
-          >
-            <motion.div
-              className="text-center px-8 py-4 bg-gray-950/80 border border-gray-700/50 rounded-2xl backdrop-blur-sm shadow-xl"
-              whileHover={{ scale: 1.05, y: -2 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <motion.div
-                className="text-3xl font-black text-white mb-1"
-                initial={{ scale: 0 }}
-                animate={isInView ? { scale: 1 } : {}}
-                transition={{ delay: 1, duration: 0.5, type: "spring" }}
-              >
-                {totalSkills}+
-              </motion.div>
-              <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                Technologies
-              </div>
-            </motion.div>
-
-            <div className="w-px h-20 bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
-
-            <motion.div
-              className="text-center px-8 py-4 bg-gray-950/80 border border-gray-700/50 rounded-2xl backdrop-blur-sm shadow-xl"
-              whileHover={{ scale: 1.05, y: -2 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <motion.div
-                className="text-3xl font-black text-white mb-1"
-                initial={{ scale: 0 }}
-                animate={isInView ? { scale: 1 } : {}}
-                transition={{ delay: 1.2, duration: 0.5, type: "spring" }}
-              >
-                {skillCategories.length}
-              </motion.div>
-              <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                Categories
-              </div>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            className="flex items-center justify-center mt-16"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.9, duration: 1.2 }}
-          >
-            <div className="h-px w-32 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent" />
-            <motion.div
-              className="mx-6 p-3 bg-gray-950/90 border border-gray-700/60 rounded-full backdrop-blur-sm shadow-lg"
-              animate={{ rotate: [0, 180, 360] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            >
-              <Zap className="w-5 h-5 text-teal-400" />
-            </motion.div>
-            <div className="h-px w-32 bg-gradient-to-l from-transparent via-green-500/50 to-transparent" />
-          </motion.div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {skillCategories.length > 0 ? (
-            skillCategories.map((categoryData, index) => (
-              <EnhancedCategoryBox
-                key={categoryData.category}
-                category={categoryData.category}
-                skills={categoryData.skills}
-                icon={categoryData.icon}
-                delay={index * 0.15}
-              />
-            ))
-          ) : (
-            <motion.div
-              className="col-span-full text-center py-20"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="p-12 bg-gray-950/80 border border-gray-800/60 rounded-3xl max-w-lg mx-auto backdrop-blur-sm shadow-2xl">
-                <div className="p-6 bg-gray-900/80 rounded-2xl mb-6 inline-block">
-                  <Code2 className="w-16 h-16 text-gray-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">
-                  Loading Skills...
-                </h3>
-                <p className="text-gray-400">
-                  Technical expertise will be displayed here
-                </p>
-              </div>
-            </motion.div>
-          )}
+          </h2>
         </div>
+
+        {/* Skills Grid - Enhanced with glassmorphism and animations */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6 md:gap-10 lg:gap-14 max-w-6xl mx-auto">
+          {skillsData.map((skill, idx) => (
+            <div
+              key={idx}
+              className="flex flex-col items-center gap-4 group cursor-default"
+              style={{
+                animation: `fadeInUp 0.6s ease-out ${idx * 0.05}s both`
+              }}
+            >
+              {/* Icon Container with Glow Effect */}
+              <div className="relative">
+                {/* Glow Background */}
+                <div 
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+                  style={{
+                    background: `radial-gradient(circle, ${skill.color}40 0%, transparent 70%)`
+                  }}
+                />
+                
+                {/* Main Icon Container */}
+                <div className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center bg-gradient-to-br from-zinc-900/80 to-zinc-950/80 backdrop-blur-xl rounded-2xl border border-zinc-800/50 group-hover:border-zinc-700/80 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 overflow-hidden p-3 shadow-2xl">
+                  {/* Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  {/* Icon */}
+                  <img 
+                    src={skill.logo} 
+                    alt={skill.name}
+                    className="w-full h-full object-contain relative z-10 group-hover:scale-105 transition-transform duration-500"
+                    style={{ 
+                      filter: skill.color === "#FFFFFF" ? "brightness(0) invert(1)" : "none"
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  
+                  {/* Corner Accent */}
+                  <div 
+                    className="absolute top-0 right-0 w-8 h-8 opacity-0 group-hover:opacity-20 transition-opacity duration-500"
+                    style={{
+                      background: `linear-gradient(135deg, ${skill.color} 0%, transparent 70%)`
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* Label */}
+              <div className="text-center">
+                <div className="text-zinc-300 group-hover:text-white font-medium text-sm md:text-base transition-colors duration-300">
+                  {skill.name}
+                </div>
+                {/* Underline Effect */}
+                <div 
+                  className="h-0.5 w-0 group-hover:w-full mx-auto mt-1 rounded-full transition-all duration-500"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${skill.color}, transparent)`
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* CSS Animation Keyframes */}
+        <style jsx>{`
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
       </div>
     </section>
   );
 };
+
+export default SkillsSection;

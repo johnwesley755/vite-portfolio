@@ -1,47 +1,53 @@
-import React from "react";
-import { Github, Linkedin, Twitter } from "lucide-react";
-import { portfolioData } from "../../data/portfolio";
+import { Footer } from "../ui/modern-animated-footer";
+import {
+  Twitter,
+  Linkedin,
+  Github,
+  Mail,
+  NotepadTextDashed,
+} from "lucide-react";
 
-export const Footer = () => {
+export default function FooterDemo() {
+  const socialLinks = [
+    {
+      icon: <Twitter className="w-6 h-6" />,
+      href: "https://twitter.com",
+      label: "Twitter",
+    },
+    {
+      icon: <Linkedin className="w-6 h-6" />,
+      href: "https://linkedin.com",
+      a: "https://linkedin.com",
+      label: "LinkedIn",
+    },
+    {
+      icon: <Github className="w-6 h-6" />,
+      href: "https://github.com",
+      label: "GitHub",
+    },
+    {
+      icon: <Mail className="w-6 h-6" />,
+      href: "mailto:contact@resumegpt.com",
+      label: "Email",
+    },
+  ];
+
+  const navLinks = [
+    { label: "Pricing", href: "/" },
+    { label: "Templates", href: "/" },
+    { label: "About", href: "/" },
+    { label: "Contact", href: "/" },
+  ];
+
   return (
-    <footer className="border-t border-gray-800/50 py-12 px-4 bg-black">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <div className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-2">
-              {portfolioData.personal.name}
-            </div>
-            <p className="text-gray-400">
-              © 2025 {portfolioData.personal.name}. All rights reserved.
-            </p>
-          </div>
-
-          <div className="flex space-x-6">
-            {[
-              { icon: Github, href: portfolioData.personal.github },
-              { icon: Linkedin, href: portfolioData.personal.linkedin },
-              { icon: Twitter, href: portfolioData.personal.twitter },
-            ].map((social, index) => (
-              <a
-                key={index}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-800/50"
-              >
-                <social.icon className="h-5 w-5" />
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-8 pt-8 border-t border-gray-800/50 text-center">
-          <p className="text-gray-500 text-sm">
-            Built with React, TypeScript & Tailwind CSS • Designed with passion
-            in Chennai, India
-          </p>
-        </div>
-      </div>
-    </footer>
+    <Footer
+      brandName="JOHN WESLEY"
+      brandDescription="John Wesley's Portfolio"
+      socialLinks={socialLinks}
+      navLinks={navLinks}
+      creatorName="John Wesley"
+      creatorUrl="johnwesley8113@gmail.com"
+      brandIcon={<NotepadTextDashed className="w-8 sm:w-10 md:w-14 h-8 sm:h-10 md:h-14 text-background drop-shadow-lg" />}
+    />
   );
-};
+}
