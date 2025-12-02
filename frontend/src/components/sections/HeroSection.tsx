@@ -19,7 +19,7 @@ import { Badge } from "../ui/Badge";
 // --- THREE.JS IMPORTS ---
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, useGLTF, PerspectiveCamera, OrbitControls, MeshDistortMaterial, Sphere } from "@react-three/drei";
-const MODEL_PATH = "/models/model (1).glb";
+const MODEL_PATH = "/models/hologram.glb";
 
 // -------------------------------------------------------------------
 // --- TYPE DEFINITIONS AND DATA EXTRACTION ---
@@ -248,7 +248,7 @@ export const HeroSection = () => {
         <ErrorBoundary>
             <Canvas 
               shadows 
-              dpr={[1, 2]} 
+              dpr={[1, 1]} 
               gl={{ 
                 alpha: true, 
                 antialias: true,
@@ -277,7 +277,7 @@ export const HeroSection = () => {
                 minPolarAngle={Math.PI / 6}
                 maxPolarAngle={Math.PI / 1.8}
                 autoRotate
-                autoRotateSpeed={0.8}
+                autoRotateSpeed={0.3}
                 maxDistance={20} 
                 minDistance={15}
               />

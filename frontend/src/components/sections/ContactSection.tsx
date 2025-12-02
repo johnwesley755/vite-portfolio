@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import {
   Mail,
@@ -33,6 +33,22 @@ export default function ContactSection() {
     error: null as string | null,
   });
   const { personal } = portfolioData;
+
+  const contactRef = useRef<HTMLElement | null>(null);
+  const [showGlobe, setShowGlobe] = useState(false);
+  useEffect(() => {
+    const target = contactRef.current;
+    if (!target) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setShowGlobe(entry.isIntersecting);
+      },
+      { rootMargin: "-25% 0px -25% 0px", threshold: 0.1 }
+    );
+    io.observe(target);
+    return () => io.disconnect();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -121,6 +137,7 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
+      ref={contactRef}
       className="relative min-h-screen overflow-hidden bg-black text-white flex items-center"
     >
       {/* BACKGROUND BEAMS INTEGRATION */}
@@ -357,28 +374,30 @@ export default function ContactSection() {
 
                   {/* Animated Globe Icon Replacement */}
                   <div className="flex-1 relative flex items-center justify-center">
-                    <div className="relative">
-                      {/* Pulsing rings */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-64 h-64 rounded-full border-2 border-blue-500/20 animate-ping" style={{ animationDuration: '3s' }} />
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-48 h-48 rounded-full border-2 border-indigo-500/30 animate-ping" style={{ animationDuration: '2s' }} />
-                      </div>
-                      
-                      {/* Center globe icon */}
-                      <div className="relative z-10 flex items-center justify-center">
-                        <div className="p-8 rounded-full bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border-2 border-blue-500/30 backdrop-blur-sm">
-                          <Globe className="h-32 w-32 text-blue-400 animate-pulse" />
+                    {showGlobe && (
+                      <div className="relative">
+                        {/* Pulsing rings */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-64 h-64 rounded-full border-2 border-blue-500/20 animate-ping" style={{ animationDuration: '3s' }} />
                         </div>
-                      </div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-48 h-48 rounded-full border-2 border-indigo-500/30 animate-ping" style={{ animationDuration: '2s' }} />
+                        </div>
+                        
+                        {/* Center globe icon */}
+                        <div className="relative z-10 flex items-center justify-center">
+                          <div className="p-8 rounded-full bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border-2 border-blue-500/30 backdrop-blur-sm">
+                            <Globe className="h-32 w-32 text-blue-400 animate-pulse" />
+                          </div>
+                        </div>
 
-                      {/* Floating connection points */}
-                      <div className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
-                      <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-indigo-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
-                      <div className="absolute bottom-1/3 left-1/3 w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '1s' }} />
-                      <div className="absolute bottom-1/4 right-1/3 w-3 h-3 rounded-full bg-blue-300 animate-pulse" style={{ animationDelay: '1.5s' }} />
-                    </div>
+                        {/* Floating connection points */}
+                        <div className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
+                        <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-indigo-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                        <div className="absolute bottom-1/3 left-1/3 w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '1s' }} />
+                        <div className="absolute bottom-1/4 right-1/3 w-3 h-3 rounded-full bg-blue-300 animate-pulse" style={{ animationDelay: '1.5s' }} />
+                      </div>
+                    )}
                   </div>
 
                   {/* Stats */}

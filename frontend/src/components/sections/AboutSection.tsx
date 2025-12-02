@@ -109,8 +109,7 @@ const AboutSection: React.FC = () => {
                 {/* Camera positioned to show full model */}
                 <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={40} />
                 
-                {/* MAXIMUM LIGHTING - EXTREMELY BRIGHT */}
-                <ambientLight intensity={3.5} />
+                <ambientLight intensity={0.6} />
 
                 
                 <AboutModel />

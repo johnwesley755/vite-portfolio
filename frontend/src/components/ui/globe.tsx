@@ -104,10 +104,10 @@ const GlobeComponent = memo(function GlobeComponent({ globeConfig, data }: World
     emissive: "#000000",
     emissiveIntensity: 0.1,
     shininess: 0.9,
-    arcTime: 2000,
-    arcLength: 0.9,
+    arcTime: 4000,
+    arcLength: 0.8,
     rings: 1,
-    maxRings: 3,
+    maxRings: 2,
     ...globeConfig,
   };
 
@@ -221,7 +221,7 @@ const GlobeComponent = memo(function GlobeComponent({ globeConfig, data }: World
       .pointColor((e) => (e as { color: string }).color)
       .pointsMerge(true)
       .pointAltitude(0.0)
-      .pointRadius(2);
+      .pointRadius(1);
 
     globeRef.current
       .ringsData([])

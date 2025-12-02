@@ -177,21 +177,14 @@ const SkillsSection = () => {
       <div className="absolute inset-0 w-full h-full mt-80">
         <Canvas 
           shadows 
-          dpr={[1, 2]} 
+          dpr={[1, 1]} 
           gl={{ alpha: true, antialias: true }}
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.25 }}
         >
           <PerspectiveCamera makeDefault position={[0, 0, 6]} fov={60} />
           
-          {/* BRIGHTER Lighting for background model */}
-          <ambientLight intensity={3} />
-          <directionalLight position={[10, 10, 10]} intensity={4} color="#ffffff" />
-          <directionalLight position={[-10, 10, -10]} intensity={3.5} color="#ffffff" />
-          <directionalLight position={[0, -10, 5]} intensity={3} color="#ffffff" />
-          <spotLight position={[0, 15, 0]} angle={0.8} penumbra={1} intensity={4} color="#ffffff" />
-          <pointLight position={[8, 8, 8]} intensity={3} color="#60a5fa" />
-          <pointLight position={[-8, -8, 8]} intensity={3} color="#a855f7" />
-          <pointLight position={[0, -8, -8]} intensity={2.5} color="#ec4899" />
+          <ambientLight intensity={0.6} />
+          <directionalLight position={[5, 5, 5]} intensity={0.8} />
           
           <SkillsModel />
           
@@ -199,7 +192,7 @@ const SkillsSection = () => {
             enableZoom={false}
             enablePan={false}
             autoRotate
-            autoRotateSpeed={0.8}
+            autoRotateSpeed={0.3}
             minPolarAngle={Math.PI / 3}
             maxPolarAngle={Math.PI / 1.5}
           />
