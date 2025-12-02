@@ -1,10 +1,8 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from '@react-three/drei';
-import { Badge } from '../ui/badge';
-import { Card, CardContent } from '../ui/Card';
-import * as THREE from 'three';
-import { GlowingEffect } from '../ui/glowing-effect'; 
+import { Badge } from '../ui/Badge';
+
 
 // 3D Background Model - LARGER SI
 const SkillsModel = () => {

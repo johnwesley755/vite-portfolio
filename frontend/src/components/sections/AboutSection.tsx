@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from '@react-three/drei';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
 import * as THREE from 'three';
 
 // 3D Model Component

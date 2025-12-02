@@ -1,5 +1,5 @@
 // src/components/HeroSection.tsx
-import React, { useState, useEffect, Suspense, useRef, Component, ErrorInfo, ReactNode } from "react";
+import React, { useState, useEffect, Suspense, useRef, Component, type ErrorInfo, type ReactNode } from "react";
 import {
   Github,
   Linkedin,
@@ -66,7 +66,7 @@ const fadeUpVariants = {
     transition: {
       duration: 1,
       delay: 0.5 + i * 0.2,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as any,
     },
   }),
 };
@@ -122,31 +122,31 @@ const Hero3DModel: React.FC = () => {
   }, []);
   
   // Determine position based on screen size
-  // Desktop (lg:) offset 5 units right for the right column layout
-  // Mobile: 0 offset to keep it centered in the single column
   const modelPosition: [number, number, number] = isLargeScreen ? [5, 0, 0] : [0, 0, 0];
-
 
   useFrame((state) => {
     if (modelRef.current) {
       // Gentle horizontal rotation
       modelRef.current.rotation.y = state.clock.elapsedTime * 0.2;
-      // Gentle floating animation (maintaining the user's base position)
+      // Gentle floating animation
       modelRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.08; 
     }
   });
 
   return (
-    // Responsive position for the model
+    // REMOVED scene.clone() to prevent memory issues
     <Center position={modelPosition}> 
       <primitive
         ref={modelRef}
-        object={scene.clone()}
+        object={scene}
         scale={0.6} 
       />
     </Center>
   );
 };
+
+// Preload the model to prevent loading delays
+useGLTF.preload(MODEL_PATH);
 
 // --- Blob Component for Background ---
 interface BlobProps {
@@ -174,8 +174,8 @@ const Blob: React.FC<BlobProps> = ({ position, scale, color, speed, distort, rot
     <Sphere args={[1, 64, 64]} position={position} scale={scale} ref={meshRef}>
       <MeshDistortMaterial
         color={color}
-        distort={distort} // How much the sphere is "distorted"
-        speed={speed} // Speed of distortion animation
+        distort={distort}
+        speed={speed}
         roughness={0.5}
         metalness={0.5}
       />
@@ -189,7 +189,7 @@ const Logo: React.FC = () => (
         <Code className="h-6 w-6 text-gray-400" />
         <span className="hidden sm:inline">{firstName}</span>
         <span className="hidden sm:inline text-gray-400">{lastName}</span>
-        <span className="sm:hidden">{firstName[0]}{lastName[0]}</span> {/* Initials for small screens */}
+        <span className="sm:hidden">{firstName[0]}{lastName[0]}</span>
     </div>
 );
 
@@ -238,43 +238,39 @@ export const HeroSection = () => {
   };
 
   return (
-    // Outer container for full-screen layout
     <div className="relative min-h-screen bg-black overflow-hidden">
       
-      {/* GLOBAL HEADER (Z-30) */}
       <Header onDownload={handleDownload} />
 
-      {/* 0. SVG WAVE PATTERN BACKGROUND (Z-0) - Furthest Back Layer */}
       <div className="absolute inset-0 z-0 opacity-20" style={SVG_STYLE} />
 
-      {/* 1. 3D Model Canvas (Z-0) - Renders transparently over the SVG */}
       <div className="absolute inset-0 z-0">
         <ErrorBoundary>
             <Canvas 
               shadows 
               dpr={[1, 2]} 
-              gl={{ alpha: true, antialias: true }}
+              gl={{ 
+                alpha: true, 
+                antialias: true,
+                powerPreference: "high-performance"
+              }}
               className="bg-transparent" 
             >
               <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={25} /> 
               
-              {/* 💡 LIGHTING - Reduced for a darker, moodier effect */}
               <ambientLight intensity={0.1} /> 
               <directionalLight position={[5, 10, 5]} intensity={0.2} castShadow />
               
-              {/* Blobs in the background */}
+              {/* Reduced number of blobs for better performance */}
               <Suspense fallback={null}>
                 <Blob position={[13, 5, -15]} scale={3} color="#2F004F" speed={1.5} distort={0.6} rotationSpeed={0.7} />
                 <Blob position={[-5, -7, -18]} scale={4} color="#003D4D" speed={1.2} distort={0.7} rotationSpeed={0.5} />
-                <Blob position={[5, 10, -20]} scale={2.5} color="#4F002F" speed={1.8} distort={0.5} rotationSpeed={0.9} />
-                <Blob position={[17, -3, -12]} scale={2} color="#1A0033" speed={1.0} distort={0.8} rotationSpeed={0.4} />
               </Suspense>
 
               <Suspense fallback={null}> 
                   <Hero3DModel />
               </Suspense>
               
-              {/* Controls - Allows user interaction in the background */}
               <OrbitControls
                 enableZoom={false}
                 enablePan={false}
@@ -286,38 +282,28 @@ export const HeroSection = () => {
                 minDistance={15}
               />
               
-              {/* Environment Lighting - SIGNIFICANTLY REDUCED INTENSITY */}
-              <Environment preset="sunset" intensity={0.1} /> 
+              <Environment preset="sunset" />
             </Canvas>
         </ErrorBoundary>
       </div>
       
-      {/* 2. Background Overlay for visual effect (Z-10) */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-        
-        {/* REMOVED: Grid pattern div */}
-
-        {/* Subtle radial fade to focus on the content columns */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.8)_100%)]" />
         <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
       </div>
 
 
-      {/* 3. Main Portfolio Content Section (Z-20) */}
       <section 
         id="hero-content" 
         className="font-['Poppins'] relative z-20 w-full min-h-screen flex items-center px-4 pt-32 pb-24"
       >
-        {/* Adjusted the main content alignment container for desktop, keeping mobile centered/full width */}
         <div className="mx-auto w-full max-w-6xl lg:ml-20"> 
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             
-            {/* COLUMN 1: Text Content (Left Side - Mobile Top) */}
             <div className="relative z-10 text-center lg:text-left">
               <div className="space-y-4">
                 
-                {/* Badge */}
                 <motion.div
                   custom={0.5}
                   variants={fadeUpVariants}
@@ -337,7 +323,6 @@ export const HeroSection = () => {
                   </Badge>
                 </motion.div>
 
-                {/* Title 1: Name */}
                 <motion.h1
                   custom={1}
                   variants={fadeUpVariants}
@@ -350,7 +335,6 @@ export const HeroSection = () => {
                   </span>
                 </motion.h1>
 
-                {/* Title 2: Role/Title */}
                 <motion.h2
                   custom={1.5}
                   variants={fadeUpVariants}
@@ -361,7 +345,6 @@ export const HeroSection = () => {
                   {typedPortfolioData.title}
                 </motion.h2>
 
-                {/* Bio */}
                 <motion.div
                   custom={2}
                   variants={fadeUpVariants}
@@ -376,7 +359,6 @@ export const HeroSection = () => {
                   </p>
                 </motion.div>
 
-                {/* Buttons */}
                 <motion.div
                   custom={3}
                   variants={fadeUpVariants}
@@ -384,7 +366,6 @@ export const HeroSection = () => {
                   animate="visible"
                   className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-6" 
                 >
-                  {/* VIEW PROJECTS - Primary Button */}
                   <Button 
                     asChild
                     size="lg"
@@ -396,7 +377,6 @@ export const HeroSection = () => {
                     </a>
                   </Button>
 
-                  {/* DOWNLOAD RESUME - Secondary Button */}
                    <Button
                     onClick={handleDownload}
                     variant="outline"
@@ -408,7 +388,6 @@ export const HeroSection = () => {
                   </Button>
                 </motion.div>
 
-                {/* Social Links */}
                 <motion.div
                   custom={4}
                   variants={fadeUpVariants}
@@ -454,7 +433,6 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* COLUMN 2: 3D Model Visual Anchor (Right Side/Mobile Bottom) */}
             <div className="h-[300px] w-full relative z-10 pointer-events-none lg:h-[500px] mt-8 lg:mt-0">
             </div>
 
@@ -462,7 +440,6 @@ export const HeroSection = () => {
         </div>
       </section>
 
-      {/* Interaction hint (Z-20) */}
       <div className="absolute bottom-12 right-1/2 translate-x-1/2 lg:right-12 lg:-translate-x-0 z-20">
         <div className="bg-zinc-900/90 backdrop-blur-md border border-zinc-700 rounded-full px-6 py-3 shadow-2xl">
           <p className="text-zinc-300 text-sm font-medium flex items-center gap-3">

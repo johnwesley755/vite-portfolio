@@ -89,9 +89,10 @@ const Portfolio = () => {
           <ProjectsSection />
         </div>
 
-        <div id="integrations">
+        {/* TEMPORARILY DISABLED - GitHub API causing performance issues */}
+        {/* <div id="integrations">
           <IntegrationsSection />
-        </div>
+        </div> */}
         
         <div id="experience">
           <EnhancedExperienceSection />

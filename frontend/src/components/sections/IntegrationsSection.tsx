@@ -35,6 +35,9 @@ export const IntegrationsSection: React.FC = () => {
                                 alt="Contribution graph"
                                 className="w-full rounded-xl border border-gray-800"
                                 loading="lazy"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                }}
                             />
                             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <img
@@ -42,12 +45,18 @@ export const IntegrationsSection: React.FC = () => {
                                     alt="GitHub stats"
                                     className="w-full rounded-xl border border-gray-800"
                                     loading="lazy"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
                                 />
                                 <img
                                     src={`https://github-readme-streak-stats.herokuapp.com?user=${username}&theme=github-dark-blue&hide_border=true&background=0d1117&stroke=4ECDC4&ring=FF6B6B&fire=FFD93D&currStreakLabel=4ECDC4`}
                                     alt="GitHub streak"
                                     className="w-full rounded-xl border border-gray-800"
                                     loading="lazy"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
                                 />
                             </div>
                             <div className="mt-4">
@@ -56,6 +65,9 @@ export const IntegrationsSection: React.FC = () => {
                                     alt="Most used languages"
                                     className="w-full md:w-3/4 rounded-xl border border-gray-800"
                                     loading="lazy"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
                                 />
                             </div>
                         </div>
