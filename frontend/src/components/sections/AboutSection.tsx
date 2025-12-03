@@ -57,10 +57,6 @@ useGLTF.preload('/models/About.glb');
 // --- Animated Background Component ---
 const AnimatedGridBackground: React.FC = () => (
     <>
-        {/* Subtle pulsating white/cyan light */}
-        <pointLight position={[5, 10, 5]} intensity={0.5} color="#9bbcf7" />
-        <pointLight position={[-5, -10, -5]} intensity={0.3} color="#ff69b4" />
-
         {/* Dynamic Grid Pattern Layer (Mimicking HeroSection style) */}
         <div className="absolute inset-0 z-0 opacity-10 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.03)_0,rgba(255,255,255,0.03)_2px,transparent_2px,transparent_14px)]" />
 

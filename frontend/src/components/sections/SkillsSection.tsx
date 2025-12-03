@@ -1,12 +1,13 @@
-import React, { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from '@react-three/drei';
 import { Badge } from '../ui/Badge';
+import * as THREE from 'three';
 
 
 // 3D Background Model - LARGER SI
 const SkillsModel = () => {
-  const modelRef = useRef(null);
+  const modelRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/models/glass-hologram.glb');
 
   useFrame((state) => {
@@ -209,7 +210,7 @@ const SkillsSection = () => {
             maxPolarAngle={Math.PI / 1.5}
           />
           
-          <Environment preset="city" intensity={2} />
+          <Environment preset="city" />
         </Canvas>
         )}
       </div>
@@ -296,7 +297,7 @@ const SkillsSection = () => {
         </div>
         
         {/* CSS Animation Keyframes */}
-        <style jsx>{`
+        <style>{`
           @keyframes fadeInUp {
             from {
               opacity: 0;
