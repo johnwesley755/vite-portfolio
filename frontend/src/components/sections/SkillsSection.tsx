@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from '@react-three/drei';
 import { Badge } from '../ui/Badge';
@@ -171,10 +171,22 @@ const skillsData = [
 ];
 
 const SkillsSection = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [showCanvas, setShowCanvas] = useState(false);
+  useEffect(() => {
+    const t = containerRef.current;
+    if (!t) return;
+    const io = new IntersectionObserver((entries) => {
+      setShowCanvas(entries[0].isIntersecting);
+    }, { rootMargin: "-20% 0px -20% 0px", threshold: 0.1 });
+    io.observe(t);
+    return () => io.disconnect();
+  }, []);
   return (
-    <section className="relative w-full min-h-screen bg-black overflow-hidden py-20 lg:py-32">
+    <section ref={containerRef} className="relative w-full min-h-screen bg-black overflow-hidden py-20 lg:py-32">
       {/* 3D Model Background - MUCH LARGER AND MORE VISIBLE */}
       <div className="absolute inset-0 w-full h-full mt-80">
+        {showCanvas && (
         <Canvas 
           shadows 
           dpr={[1, 1]} 
@@ -199,6 +211,7 @@ const SkillsSection = () => {
           
           <Environment preset="city" intensity={2} />
         </Canvas>
+        )}
       </div>
 
       {/* Foreground Content */}

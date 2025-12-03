@@ -21,7 +21,7 @@ import { motion } from "framer-motion";
 import { portfolioData } from "../../data/portfolio"; 
 import { LinkPreview } from "../ui/link-preview"; 
 import { AnimatedTooltip } from "../ui/animated-tooltip";
-import { BeamsBackground } from "../ui/beams-background"; 
+
 // SHADCN CARD & BUTTON IMPORTS
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/Card"; // Placeholder import
 import { Button } from "../ui/Button"; // Reusing Button for Tabs/Filters
@@ -453,9 +453,22 @@ const ProjectsSection: React.FC = () => {
     )
     : byCategory;
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [showBackground, setShowBackground] = useState(false);
+  useEffect(() => {
+    const t = containerRef.current;
+    if (!t) return;
+    const io = new IntersectionObserver((entries) => {
+      setShowBackground(entries[0].isIntersecting);
+    }, { rootMargin: "-20% 0px -20% 0px", threshold: 0.1 });
+    io.observe(t);
+    return () => io.disconnect();
+  }, []);
+
   return (
     
       <section
+        ref={containerRef}
         className="w-full min-h-screen relative overflow-hidden bg-gray-950/90" 
         id="projects"
       >
@@ -467,9 +480,10 @@ const ProjectsSection: React.FC = () => {
         */}
         <div className="absolute inset-0 z-0 opacity-50"> 
             <ErrorBoundary>
+                {showBackground && (
                 <Canvas 
                     shadows 
-                    dpr={[1, 2]} 
+                    dpr={[1, 1]} 
                     gl={{ alpha: true, antialias: true }}
                     className="bg-transparent"
                 >
@@ -482,9 +496,7 @@ const ProjectsSection: React.FC = () => {
                     
                     {/* Blobs for abstract background movement */}
                     <Suspense fallback={null}>
-                        <Blob position={[15, 10, -20]} scale={5} color="#5A00FF" speed={1.0} distort={0.6} rotationSpeed={0.5} />
-                        <Blob position={[-15, -10, -25]} scale={6} color="#00FFFF" speed={0.8} distort={0.7} rotationSpeed={0.4} />
-                        <Blob position={[0, 20, -30]} scale={4} color="#FF00FF" speed={1.2} distort={0.5} rotationSpeed={0.6} />
+                        <Blob position={[10, 8, -22]} scale={4} color="#5A00FF" speed={0.6} distort={0.5} rotationSpeed={0.3} />
                     </Suspense>
 
                     
@@ -493,14 +505,14 @@ const ProjectsSection: React.FC = () => {
                         enableZoom={false}
                         enablePan={false}
                         autoRotate
-                        autoRotateSpeed={0.2}
+                        autoRotateSpeed={0.1}
                         maxDistance={35}
                         minDistance={25}
                     />
                     
-                    {/* Environment Lighting */}
-                    <Environment preset="night" intensity={0.15} /> 
+
                 </Canvas>
+                )}
             </ErrorBoundary>
         </div>
         {/* --- Background Overlay Layer (Z-10) --- */}

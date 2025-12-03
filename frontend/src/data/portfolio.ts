@@ -46,7 +46,7 @@ export const portfolioData = {
     email: "johnwesley8113@gmail.com",
     phone: "+91 9841958457",
     location: "Chennai, Tamil Nadu, IN",
-    github: "https://github.com/johnwesley755",
+    github: "https://github.com/johnwesley755/ai-calling-agent",
     linkedin: "https://www.linkedin.com/in/john-wesley-6707ab258/",
     twitter: "https://x.com/JohnWesley97513",
     image: profileImg,

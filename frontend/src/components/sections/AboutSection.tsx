@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, PerspectiveCamera } from '@react-three/drei';
 import { Badge } from '../ui/Badge';
@@ -29,8 +29,19 @@ const AboutModel: React.FC = () => {
 
 // Main About Section - NO PARALLAX
 const AboutSection: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [showCanvas, setShowCanvas] = useState(false);
+  useEffect(() => {
+    const t = containerRef.current;
+    if (!t) return;
+    const io = new IntersectionObserver((entries) => {
+      setShowCanvas(entries[0].isIntersecting);
+    }, { rootMargin: "-20% 0px -20% 0px", threshold: 0.1 });
+    io.observe(t);
+    return () => io.disconnect();
+  }, []);
   return (
-    <section className="relative w-full min-h-screen bg-black overflow-hidden py-20 lg:py-32">
+    <section ref={containerRef} className="relative w-full min-h-screen bg-black overflow-hidden py-20 lg:py-32">
       <div className="relative max-w-7xl mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           
@@ -105,7 +116,8 @@ const AboutSection: React.FC = () => {
           <div className="relative w-full h-[600px] lg:h-[800px] z-10 flex items-center justify-center">
             {/* Canvas with EXTREME BRIGHT LIGHTING */}
             <div className="w-full h-full">
-              <Canvas shadows dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
+              {showCanvas && (
+              <Canvas shadows dpr={[1, 1]} gl={{ alpha: true, antialias: true }}>
                 {/* Camera positioned to show full model */}
                 <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={40} />
                 
@@ -127,6 +139,7 @@ const AboutSection: React.FC = () => {
                 
                 <Environment preset="sunset" intensity={2.5} />
               </Canvas>
+              )}
             </div>
 
             {/* Interaction hint */}
