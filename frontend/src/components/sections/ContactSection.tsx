@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+// Essential imports kept
 import emailjs from "@emailjs/browser";
 import {
   Mail,
@@ -8,15 +9,36 @@ import {
   AlertCircle,
   Send,
   FileText,
-  ArrowLeft,
+  ArrowRight,
   User,
   MessageSquare,
   Twitter,
   Github,
   Globe,
+  Zap,
 } from "lucide-react";
+
+// RE-IMPORTED: Using the external portfolioData file as requested
 import { portfolioData } from "../../data/portfolio";
-import { BackgroundBeams } from "../ui/background-beams";
+
+// Removed: import { BackgroundBeams } from "../ui/background-beams";
+
+// Custom component for the Parallax Subtle Background (Architectural Texture)
+const ParallaxBackground = () => (
+    <div className="absolute inset-0 overflow-hidden">
+        {/* Subtle fixed texture layer for depth and parallax */}
+        <div className="absolute inset-0 bg-repeat opacity-[0.03] transition-transform duration-75 ease-out"
+             style={{ 
+                 // Dark, professional grid pattern
+                 backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
+                 backgroundSize: "40px 40px",
+                 // Parallax effect via CSS variable set by useEffect
+                 transform: "translateY(var(--scroll-y, 0)) scale(1.05)",
+             }}
+        />
+    </div>
+);
+
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -32,23 +54,27 @@ export default function ContactSection() {
     success: false,
     error: null as string | null,
   });
+
+  // USING IMPORTED DATA
   const { personal } = portfolioData;
 
   const contactRef = useRef<HTMLElement | null>(null);
-  const [showGlobe, setShowGlobe] = useState(false);
+
+  // Parallax Effect Implementation
   useEffect(() => {
-    const target = contactRef.current;
-    if (!target) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setShowGlobe(entry.isIntersecting);
-      },
-      { rootMargin: "-25% 0px -25% 0px", threshold: 0.1 }
-    );
-    io.observe(target);
-    return () => io.disconnect();
+    const handleScroll = () => {
+        if (contactRef.current) {
+            const sectionTop = contactRef.current.getBoundingClientRect().top;
+            const slowScroll = sectionTop * 0.05; 
+            document.documentElement.style.setProperty('--scroll-y', `${slowScroll}px`);
+        }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -84,7 +110,7 @@ export default function ContactSection() {
       setStatus({
         loading: false,
         success: false,
-        error: "Email service not configured. Contact me directly.",
+        error: "Email service not configured. Check environment variables.",
       });
       return;
     }
@@ -94,7 +120,7 @@ export default function ContactSection() {
     const templateParams = {
       from_name: formData.name,
       from_email: formData.email,
-      to_name: personal.name,
+      to_name: personal.name || "Recipient", // Using personal.name
       message: formData.message,
     };
 
@@ -104,353 +130,262 @@ export default function ContactSection() {
       setFormData({ name: "", email: "", message: "" });
       setTimeout(
         () => setStatus({ loading: false, success: false, error: null }),
-        3000
+        4000 
       );
     } catch (err) {
       console.error("EmailJS send error:", err);
       setStatus({
         loading: false,
         success: false,
-        error: "Failed to send message. Try again later.",
+        error: "Transmission failed. Check network or try again later.",
       });
     }
   };
 
+  // Input icon utility component
   const InputIcon: React.FC<{ type: "name" | "email" | "message" }> = ({
     type,
   }) => {
+    const iconClass = "h-5 w-5 text-gray-400 absolute left-4";
     if (type === "name")
       return (
-        <User className="h-5 w-5 text-blue-300/70 absolute left-4 top-1/2 transform -translate-y-1/2" />
+        <User className={`${iconClass} top-1/2 transform -translate-y-1/2`} />
       );
     if (type === "email")
       return (
-        <Mail className="h-5 w-5 text-blue-300/70 absolute left-4 top-1/2 transform -translate-y-1/2" />
+        <Mail className={`${iconClass} top-1/2 transform -translate-y-1/2`} />
       );
     if (type === "message")
       return (
-        <MessageSquare className="h-5 w-5 text-blue-300/70 absolute left-4 top-4" />
+        <MessageSquare className={`${iconClass} top-4`} />
       );
     return null;
   };
+
 
   return (
     <section
       id="contact"
       ref={contactRef}
-      className="relative min-h-screen overflow-hidden bg-black text-white flex items-center"
+      className="relative min-h-screen bg-black text-white flex items-center pt-24 pb-16 md:py-32 overflow-hidden"
     >
-      {/* BACKGROUND BEAMS INTEGRATION */}
-      <div
-        aria-hidden
-        className="absolute inset-0 h-full z-0 pointer-events-none"
-      >
-        <BackgroundBeams className="absolute inset-0 h-full" />
-        <div className="absolute inset-0 bg-black/20" />
-      </div>
+      
+      {/* Parallax Background Layer */}
+      <ParallaxBackground />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-16">
-        {/* Header with elegant styling */}
-        <div className="mb-16 text-center">
-          <div className="inline-block mb-4">
-            <p className="text-xs font-mono tracking-[0.3em] text-blue-400/80 uppercase relative">
-              <span className="relative z-10">Initiate Contact</span>
-              <span className="absolute inset-0 block blur-sm bg-blue-500/20 -z-10" />
-            </p>
-          </div>
-          <h2 className="text-6xl md:text-7xl font-thin tracking-wide mb-4 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-            Get In Touch
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6">
+        
+        {/* Header - Large, Professional Typography */}
+        <div className="mb-20 text-center">
+          <p className="text-lg font-light tracking-[0.3em] text-gray-500 uppercase mb-4">
+            — Initiate Collaboration —
+          </p>
+          <h2 className="text-6xl md:text-8xl font-thin tracking-tight leading-snug mb-6">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-white">
+              Let's Create Impact.
+            </span>
           </h2>
-          <div className="w-24 h-[1px] mx-auto bg-gradient-to-r from-transparent via-blue-400/50 to-transparent mb-6" />
-          <p className="text-gray-400/90 max-w-xl mx-auto text-sm tracking-wide leading-relaxed">
-            Open to collaboration across dimensions. Whether it's a project,
-            opportunity, or just to say hello — transmit your message below.
+          <div className="w-20 h-0.5 mx-auto bg-gradient-to-r from-transparent via-gray-500/50 to-transparent" />
+          <p className="text-gray-400 max-w-2xl mx-auto text-xl mt-8 font-light leading-relaxed">
+            I am available for new projects and professional inquiries. Please use the secure form below.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* FORM CARD */}
-          <div className="relative flex items-center justify-center">
-            <div className="relative w-full max-w-xl">
-              {/* Glow effects */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20 rounded-3xl blur-xl opacity-50" />
-
-              <div className="relative bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50 border border-blue-500/10 rounded-2xl p-10 shadow-2xl backdrop-blur-md">
-                {/* Corner accents */}
-                <div className="absolute top-0 left-0 w-20 h-20 border-l-2 border-t-2 border-blue-500/30 rounded-tl-2xl" />
-                <div className="absolute bottom-0 right-0 w-20 h-20 border-r-2 border-b-2 border-blue-500/30 rounded-br-2xl" />
-
-                <div className="flex flex-col gap-6">
-                  {/* Location badge */}
-                  <div className="flex items-center gap-4 pb-6 border-b border-blue-500/10">
-                    <div className="p-2.5 rounded-lg bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/20">
-                      <MapPin className="h-5 w-5 text-blue-300" />
-                    </div>
+        {/* Content Grid (Form and Info) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+          
+          {/* Information Column (Left) - Uses imported data */}
+          <div className="lg:col-span-1 space-y-8 p-8 rounded-xl bg-slate-900/50 border border-gray-700/30 shadow-2xl">
+            
+            <h3 className="text-2xl font-normal text-white border-b border-gray-700/50 pb-4 flex items-center gap-3">
+                <Zap className="h-5 w-5 text-gray-400" />
+                Contact Channels
+            </h3>
+            
+            <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                    <MapPin className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider">
-                        Coordinates
-                      </p>
-                      <p className="font-light text-gray-200">
-                        {personal.location || "Earth"}
-                      </p>
+                        <p className="text-sm uppercase tracking-wider text-gray-600">Base Location</p>
+                        <p className="text-lg text-white font-light">{personal.location || "Global, Digital Sphere"}</p>
                     </div>
-                  </div>
-
-                  {/* Status messages */}
-                  {status.success && (
-                    <div className="flex items-center gap-3 p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 animate-pulse">
-                      <CheckCircle className="h-5 w-5" />
-                      <span className="text-sm font-light">
-                        Transmission successful
-                      </span>
-                    </div>
-                  )}
-                  {status.error && (
-                    <div className="flex items-center gap-3 p-4 rounded-lg bg-red-500/5 border border-red-500/20 text-red-300">
-                      <AlertCircle className="h-5 w-5" />
-                      <span className="text-sm font-light">{status.error}</span>
-                    </div>
-                  )}
-
-                  {/* Form */}
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="relative">
-                      <InputIcon type="name" />
-                      <input
-                        name="name"
-                        id="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Your name"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-950/40 border border-blue-500/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/30 focus:bg-slate-950/60 transition-all duration-300"
-                      />
-                      {errors.name && (
-                        <p className="mt-1.5 text-xs text-red-400 font-light">
-                          {errors.name}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="relative">
-                      <InputIcon type="email" />
-                      <input
-                        name="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="you@domain.com"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-950/40 border border-blue-500/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/30 focus:bg-slate-950/60 transition-all duration-300"
-                      />
-                      {errors.email && (
-                        <p className="mt-1.5 text-xs text-red-400 font-light">
-                          {errors.email}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="relative">
-                      <InputIcon type="message" />
-                      <textarea
-                        name="message"
-                        id="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        rows={5}
-                        placeholder="Your message across the void..."
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-950/40 border border-blue-500/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/30 focus:bg-slate-950/60 transition-all duration-300 resize-none"
-                      />
-                      {errors.message && (
-                        <p className="mt-1.5 text-xs text-red-400 font-light">
-                          {errors.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex gap-4 items-center pt-2">
-                      <button
-                        type="submit"
-                        disabled={status.loading}
-                        className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-light tracking-wide shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        {status.loading ? (
-                          <>
-                            <div className="relative z-10 animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                            <span className="relative z-10 text-sm">
-                              Transmitting...
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <Send className="relative z-10 h-4 w-4" />
-                            <span className="relative z-10 text-sm">
-                              Send Message
-                            </span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setFormData({ name: "", email: "", message: "" })
-                        }
-                        className="ml-auto text-sm text-gray-400 hover:text-blue-300 transition-colors duration-300 font-light"
-                      >
-                        Reset
-                      </button>
-                    </div>
-                  </form>
-
-                  {/* Social links */}
-                  <div className="mt-6 pt-6 flex items-center justify-between text-sm border-t border-blue-500/10">
-                    <div className="flex items-center gap-4">
-                      <a
-                        href={personal.linkedin || "#"}
-                        aria-label="LinkedIn"
-                        className="text-gray-400 hover:text-blue-400 transition-colors duration-300"
-                      >
-                        <Linkedin className="h-5 w-5" />
-                      </a>
-                      <a
-                        href={personal.twitter || "#"}
-                        aria-label="Twitter"
-                        className="text-gray-400 hover:text-blue-400 transition-colors duration-300"
-                      >
-                        <Twitter className="h-5 w-5" />
-                      </a>
-                      <a
-                        href={personal.github || "#"}
-                        aria-label="Github"
-                        className="text-gray-400 hover:text-blue-400 transition-colors duration-300"
-                      >
-                        <Github className="h-5 w-5" />
-                      </a>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-gray-500 hover:text-gray-300 transition-colors duration-300 cursor-pointer">
-                      <FileText className="h-4 w-4" />
-                      <span className="text-xs font-light">Resume</span>
-                      <ArrowLeft className="h-3 w-3 rotate-180 opacity-60" />
-                    </div>
-                  </div>
                 </div>
-              </div>
+                
+                <div className="flex items-start gap-4">
+                    <Globe className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm uppercase tracking-wider text-gray-600">Status</p>
+                        <p className="text-lg text-emerald-400 font-light flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                            Active (24/7)
+                        </p>
+                    </div>
+                </div>
+
+                {/* Resume Link - Uses imported data */}
+                <div className="pt-4 border-t border-gray-700/30">
+                  <a href={`mailto:${personal.email || '#'}`} className="group text-white text-lg font-light hover:text-gray-300 transition-colors flex items-center gap-2">
+                      <Send className="h-4 w-4" />
+                      Direct Email
+                  </a>
+                  <a href={personal.resumeUrl || '#'} target="_blank" rel="noopener noreferrer" className="group text-gray-500 text-sm font-light hover:text-gray-300 transition-colors flex items-center gap-2 mt-3">
+                      <FileText className="h-4 w-4" />
+                      View CV/Resume
+                      <ArrowRight className="h-3 w-3 inline-block ml-1 group-hover:translate-x-0.5 transition-transform" />
+                  </a>
+                </div>
+            </div>
+
+            {/* Social Links - Uses imported data */}
+            <div className="pt-6 border-t border-gray-700/50">
+                <h4 className="text-sm uppercase tracking-wider text-gray-600 mb-4">Connect on:</h4>
+                <div className="flex gap-4">
+                    <a href={personal.linkedin || '#'} aria-label="LinkedIn" className="text-gray-600 hover:text-white transition duration-300"><Linkedin className="h-5 w-5" /></a>
+                    <a href={personal.twitter || '#'} aria-label="Twitter" className="text-gray-600 hover:text-white transition duration-300"><Twitter className="h-5 w-5" /></a>
+                    <a href={personal.github || '#'} aria-label="Github" className="text-gray-600 hover:text-white transition duration-300"><Github className="h-5 w-5" /></a>
+                </div>
             </div>
           </div>
 
-          {/* NETWORK STATUS CARD - Replacing Globe */}
-          <div className="flex items-center justify-center">
-            <div className="relative w-full max-w-md">
-              {/* Outer glow */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20 rounded-3xl blur-2xl opacity-60" />
 
-              <div className="relative w-full h-[520px] rounded-2xl overflow-hidden bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50 border border-blue-500/10 shadow-2xl backdrop-blur-sm">
-                {/* Corner accents */}
-                <div className="absolute top-0 right-0 w-24 h-24 border-r-2 border-t-2 border-blue-500/20 rounded-tr-2xl z-20" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 border-l-2 border-b-2 border-blue-500/20 rounded-bl-2xl z-20" />
+          {/* Form Card (Right, spanning 2 columns) */}
+          <div className="lg:col-span-2 relative">
+            <div className="relative w-full p-10 md:p-12 bg-slate-900/60 border border-gray-700/30 rounded-xl shadow-2xl">
+            
+              <h3 className="text-2xl font-normal text-white mb-8 border-b border-gray-700/20 pb-4">
+                Secure Inquiry Form
+              </h3>
 
-                <div className="absolute inset-0 p-8 flex flex-col z-10">
-                  <div className="flex items-start justify-between mb-6">
-                    <div>
-                      <p className="text-xs text-blue-400/70 uppercase tracking-wider mb-1">
-                        Network Status
-                      </p>
-                      <h3 className="text-white text-3xl font-thin tracking-wide">
-                        Global Reach
-                      </h3>
-                    </div>
+              {/* Status messages */}
+              {(status.success || status.error) && (
+                <div className={`flex items-center gap-3 p-4 mb-6 rounded-lg font-mono text-sm ${
+                    status.success ? 'bg-emerald-600/10 border border-emerald-500/30 text-emerald-400' : 
+                    'bg-red-600/10 border border-red-500/30 text-red-400'
+                }`}>
+                  {status.success ? <CheckCircle className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+                  <span className="font-light">
+                    {status.success ? "Message received. A prompt response is guaranteed." : status.error}
+                  </span>
+                </div>
+              )}
 
-                    <div className="text-right">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <p className="text-xs text-emerald-400 font-light">
-                          Online
-                        </p>
-                      </div>
-                      <p className="text-xs text-gray-500 font-mono">24/7</p>
-                    </div>
-                  </div>
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                
+                {/* Name Input */}
+                <div className="relative">
+                  <InputIcon type="name" />
+                  <input
+                    name="name"
+                    id="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Full Name / Company Name"
+                    className="w-full pl-14 pr-4 py-4 bg-slate-950/40 border border-gray-700/50 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-white/50 focus:bg-slate-900/60 transition-all duration-300 text-lg font-light"
+                  />
+                  {errors.name && (
+                    <p className="mt-1.5 text-xs text-red-400 font-mono">
+                      {errors.name}
+                    </p>
+                  )}
+                </div>
 
-                  {/* Animated Globe Icon Replacement */}
-                  <div className="flex-1 relative flex items-center justify-center">
-                    {showGlobe && (
-                      <div className="relative">
-                        {/* Pulsing rings */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-64 h-64 rounded-full border-2 border-blue-500/20 animate-ping" style={{ animationDuration: '3s' }} />
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-48 h-48 rounded-full border-2 border-indigo-500/30 animate-ping" style={{ animationDuration: '2s' }} />
-                        </div>
-                        
-                        {/* Center globe icon */}
-                        <div className="relative z-10 flex items-center justify-center">
-                          <div className="p-8 rounded-full bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border-2 border-blue-500/30 backdrop-blur-sm">
-                            <Globe className="h-32 w-32 text-blue-400 animate-pulse" />
-                          </div>
-                        </div>
+                {/* Email Input */}
+                <div className="relative">
+                  <InputIcon type="email" />
+                  <input
+                    name="email"
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Business Email Address"
+                    className="w-full pl-14 pr-4 py-4 bg-slate-950/40 border border-gray-700/50 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-white/50 focus:bg-slate-900/60 transition-all duration-300 text-lg font-light"
+                  />
+                  {errors.email && (
+                    <p className="mt-1.5 text-xs text-red-400 font-mono">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
 
-                        {/* Floating connection points */}
-                        <div className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
-                        <div className="absolute top-1/3 right-1/4 w-2 h-2 rounded-full bg-indigo-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
-                        <div className="absolute bottom-1/3 left-1/3 w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '1s' }} />
-                        <div className="absolute bottom-1/4 right-1/3 w-3 h-3 rounded-full bg-blue-300 animate-pulse" style={{ animationDelay: '1.5s' }} />
-                      </div>
+                {/* Message Textarea */}
+                <div className="relative">
+                  <InputIcon type="message" />
+                  <textarea
+                    name="message"
+                    id="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={6}
+                    placeholder="Your detailed proposal or request..."
+                    className="w-full pl-14 pr-4 py-4 bg-slate-950/40 border border-gray-700/50 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-white/50 focus:bg-slate-900/60 transition-all duration-300 resize-none text-lg font-light"
+                  />
+                  {errors.message && (
+                    <p className="mt-1.5 text-xs text-red-400 font-mono">
+                      {errors.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit and Reset Buttons */}
+                <div className="flex gap-4 items-center pt-2">
+                  <button
+                    type="submit"
+                    disabled={status.loading}
+                    className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-lg bg-white text-black text-lg font-medium tracking-wide shadow-xl shadow-gray-800/25 hover:bg-gray-200 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    {status.loading ? (
+                      <>
+                        <div className="relative z-10 animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent" />
+                        <span className="relative z-10">
+                          SUBMITTING...
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="relative z-10 h-5 w-5" />
+                        <span className="relative z-10">
+                          SEND MESSAGE
+                        </span>
+                      </>
                     )}
-                  </div>
+                  </button>
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="text-center p-3 rounded-lg bg-slate-900/40 border border-blue-500/10">
-                      <p className="text-2xl font-light text-blue-400">24/7</p>
-                      <p className="text-xs text-gray-500 mt-1">Available</p>
-                    </div>
-                    <div className="text-center p-3 rounded-lg bg-slate-900/40 border border-blue-500/10">
-                      <p className="text-2xl font-light text-indigo-400">∞</p>
-                      <p className="text-xs text-gray-500 mt-1">Reach</p>
-                    </div>
-                    <div className="text-center p-3 rounded-lg bg-slate-900/40 border border-blue-500/10">
-                      <p className="text-2xl font-light text-purple-400">100%</p>
-                      <p className="text-xs text-gray-500 mt-1">Uptime</p>
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                        setFormData({ name: "", email: "", message: "" });
+                        setErrors({});
+                        setStatus({ loading: false, success: false, error: null });
+                    }}
+                    className="ml-auto text-lg text-gray-500 hover:text-white transition-colors duration-300 font-light px-4 py-2 border border-transparent hover:border-gray-700/50 rounded-lg"
+                  >
+                    Reset Form
+                  </button>
                 </div>
-
-                {/* Info text */}
-                <div className="absolute bottom-6 left-8 right-8 text-center text-xs text-gray-500 z-20 font-light">
-                  <span>Optimized for performance</span>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Custom Styles */}
       <style>{`
-        @keyframes shimmer {
-          0% { background-position: -100% 0; }
-          100% { background-position: 100% 0; }
+        /* Define the CSS variable used by the parallax background */
+        :root {
+            --scroll-y: 0px;
+        }
+
+        /* Simplified keyframes */
+        @keyframes pulse-white {
+          0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); }
+          50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
         }
         
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          50% {
-            transform: translateY(-100px) translateX(50px);
-          }
-        }
-        
-        .animate-float {
-          animation: float 15s infinite ease-in-out;
+        .shadow-pulse {
+          animation: pulse-white 5s infinite ease-in-out;
         }
       `}</style>
     </section>
