@@ -69,7 +69,7 @@ export const Footer = ({
         className
       )}
     >
-      <footer className="relative border-t border-gray-900 bg-black/95">
+      <footer className="relative bg-black/95">
         {/* Soft glow rising from the footer */}
         <div
           className="pointer-events-none absolute inset-x-0 -top-32 h-64 bg-gradient-to-b from-white/15 via-white/5 to-transparent opacity-60 blur-xl"

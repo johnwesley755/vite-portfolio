@@ -9,7 +9,7 @@ import ContactSection from "./components/sections/ContactSection";
 import FooterDemo from "./components/sections/Footer"; // Assuming FooterDemo is the default export of a file named Footer.tsx
 
 
-import { Chatbot } from "./components/ui/Chatbot";
+import { Chatbot } from "./components/sections/Chatbot";
 import IntegrationsSection from "./components/sections/IntegrationsSection";
 
 const Portfolio = () => {
