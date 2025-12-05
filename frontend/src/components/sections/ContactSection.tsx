@@ -31,13 +31,13 @@ import { portfolioData } from "../../data/portfolio";
 
 const ARCS_DATA = [
   // New York -> London
-  { startLat: 40.7128, startLng: -74.006, endLat: 51.5074, endLng: 0.1278, color: ['#6366F1', '#D1D5DB'], label: "NY -> London" },
+  { startLat: 40.7128, startLng: -74.006, endLat: 51.5074, endLng: 0.1278, color: ['#F59E0B', '#D1D5DB'], label: "NY -> London" },
   // Sydney -> Tokyo
-  { startLat: -33.8688, startLng: 151.2093, endLat: 35.6895, endLng: 139.6917, color: ['#6366F1', '#FBBF24'], label: "Sydney -> Tokyo" },
+  { startLat: -33.8688, startLng: 151.2093, endLat: 35.6895, endLng: 139.6917, color: ['#F59E0B', '#FBBF24'], label: "Sydney -> Tokyo" },
   // Paris -> Rio de Janeiro
-  { startLat: 48.8566, startLng: 2.3522, endLat: -22.9068, endLng: -43.1729, color: ['#6366F1', '#EF4444'], label: "Paris -> Rio" },
+  { startLat: 48.8566, startLng: 2.3522, endLat: -22.9068, endLng: -43.1729, color: ['#F59E0B', '#EF4444'], label: "Paris -> Rio" },
   // San Francisco -> Berlin
-  { startLat: 37.7749, startLng: -122.4194, endLat: 52.5200, endLng: 13.4050, color: ['#6366F1', '#10B981'], label: "SF -> Berlin" },
+  { startLat: 37.7749, startLng: -122.4194, endLat: 52.5200, endLng: 13.4050, color: ['#F59E0B', '#10B981'], label: "SF -> Berlin" },
 ];
 
 // =================================================================
@@ -72,7 +72,7 @@ const GlobeComponent = ({ width, height }) => {
         
         // Globe styling
         showAtmosphere={true}
-        atmosphereColor="#6366F1"
+        atmosphereColor="#F59E0B"
         atmosphereAltitude={0.25}
 
         // Arc Layer Configuration
@@ -114,8 +114,8 @@ const ParallaxBackground = () => (
 
 const BlobBackground = () => (
     <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="blob blob-1 bg-indigo-500/10" />
-        <div className="blob blob-2 bg-pink-500/10" />
+        <div className="blob blob-1 bg-orange-500/10" />
+        <div className="blob blob-2 bg-yellow-500/10" />
     </div>
 );
 
@@ -285,35 +285,35 @@ export default function ContactSection() {
                 {/* Name Input */}
                 <div className="relative">
                   <InputIcon type="name" />
-                  <input name="name" id="name" value={formData.name} onChange={handleChange} placeholder="Full Name / Company Name" className="w-full pl-14 pr-4 py-3 sm:py-4 bg-black/30 border border-gray-700/70 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all duration-300 text-base sm:text-lg font-light"/>
+                  <input name="name" id="name" value={formData.name} onChange={handleChange} placeholder="Full Name / Company Name" className="w-full pl-14 pr-4 py-3 sm:py-4 bg-black/30 border border-gray-700/70 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all duration-300 text-base sm:text-lg font-light"/>
                   {errors.name && (<p className="mt-1.5 text-xs text-red-400 font-mono">{errors.name}</p>)}
                 </div>
 
                 {/* Email Input */}
                 <div className="relative">
                   <InputIcon type="email" />
-                  <input name="email" id="email" type="email" value={formData.email} onChange={handleChange} placeholder="Business Email Address" className="w-full pl-14 pr-4 py-3 sm:py-4 bg-black/30 border border-gray-700/70 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all duration-300 text-base sm:text-lg font-light"/>
+                  <input name="email" id="email" type="email" value={formData.email} onChange={handleChange} placeholder="Business Email Address" className="w-full pl-14 pr-4 py-3 sm:py-4 bg-black/30 border border-gray-700/70 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all duration-300 text-base sm:text-lg font-light"/>
                   {errors.email && (<p className="mt-1.5 text-xs text-red-400 font-mono">{errors.email}</p>)}
                 </div>
 
                 {/* Message Textarea */}
                 <div className="relative">
                   <InputIcon type="message" />
-                  <textarea name="message" id="message" value={formData.message} onChange={handleChange} rows={5} placeholder="Your detailed proposal or request..." className="w-full pl-14 pr-4 py-4 bg-black/30 border border-gray-700/70 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all duration-300 resize-none text-base sm:text-lg font-light"/>
+                  <textarea name="message" id="message" value={formData.message} onChange={handleChange} rows={5} placeholder="Your detailed proposal or request..." className="w-full pl-14 pr-4 py-4 bg-black/30 border border-gray-700/70 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all duration-300 resize-none text-base sm:text-lg font-light"/>
                   {errors.message && (<p className="mt-1.5 text-xs text-red-400 font-mono">{errors.message}</p>)}
                 </div>
 
                 {/* Submit and Reset Buttons */}
                 <div className="flex flex-wrap gap-4 items-center pt-2">
-                  <button type="submit" disabled={status.loading} className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3 sm:py-4 rounded-lg bg-indigo-500 text-white text-base sm:text-lg font-medium tracking-wide shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <button type="submit" disabled={status.loading} className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3 sm:py-4 rounded-lg bg-orange-500 text-white text-base sm:text-lg font-medium tracking-wide shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     {status.loading ? (
                       <><div className="relative z-10 animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /><span className="relative z-10">SUBMITTING...</span></>
                     ) : (
                       <><Send className="relative z-10 h-5 w-5" /><span className="relative z-10">SEND MESSAGE</span></>
                     )}
                   </button>
-                  <button type="button" onClick={() => { setFormData({ name: "", email: "", message: "" }); setErrors({}); setStatus({ loading: false, success: false, error: null }); }} className="ml-auto text-sm sm:text-lg text-gray-500 hover:text-indigo-400 transition-colors duration-300 font-light px-4 py-2 border border-transparent hover:border-gray-700/50 rounded-lg">
+                  <button type="button" onClick={() => { setFormData({ name: "", email: "", message: "" }); setErrors({}); setStatus({ loading: false, success: false, error: null }); }} className="ml-auto text-sm sm:text-lg text-gray-500 hover:text-orange-400 transition-colors duration-300 font-light px-4 py-2 border border-transparent hover:border-gray-700/50 rounded-lg">
                     Reset Form
                   </button>
                 </div>
@@ -323,7 +323,7 @@ export default function ContactSection() {
             {/* 2. Contact Channels (Below form, Linear/Horizontal Layout) */}
             <div className="mt-8 p-6 sm:p-8 rounded-xl bg-black border border-gray-700/50 shadow-xl">
                 <h4 className="text-sm uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-indigo-400"/> Direct Channels
+                    <Zap className="h-4 w-4 text-orange-400"/> Direct Channels
                 </h4>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                     
@@ -350,11 +350,11 @@ export default function ContactSection() {
 
                     {/* Resume/Email Link */}
                     <div className="flex items-center gap-6 sm:ml-auto">
-                        <a href={`mailto:${personal.email || '#'}`} className="group text-white text-sm font-light hover:text-indigo-400 transition-colors flex items-center gap-2">
+                        <a href={`mailto:${personal.email || '#'}`} className="group text-white text-sm font-light hover:text-orange-400 transition-colors flex items-center gap-2">
                             <Send className="h-4 w-4" />
                             Direct Email
                         </a>
-                        <a href={personal.resumeUrl || '#'} target="_blank" rel="noopener noreferrer" className="group text-gray-500 text-sm font-light hover:text-indigo-400 transition-colors flex items-center gap-2">
+                        <a href={personal.resumeUrl || '#'} target="_blank" rel="noopener noreferrer" className="group text-gray-500 text-sm font-light hover:text-orange-400 transition-colors flex items-center gap-2">
                             <FileText className="h-4 w-4" />
                             View CV
                         </a>
@@ -380,9 +380,9 @@ export default function ContactSection() {
             <div className="w-full p-6 rounded-xl bg-black border border-gray-700/50 shadow-xl">
                 <h4 className="text-xs uppercase tracking-wider text-gray-400 mb-4">Connect on:</h4>
                 <div className="flex gap-4">
-                    <a href={personal.linkedin || '#'} aria-label="LinkedIn" className="text-gray-500 hover:text-indigo-400 transition duration-300"><Linkedin className="h-6 w-6" /></a>
-                    <a href={personal.twitter || '#'} aria-label="Twitter" className="text-gray-500 hover:text-indigo-400 transition duration-300"><Twitter className="h-6 w-6" /></a>
-                    <a href={personal.github || '#'} aria-label="Github" className="text-gray-500 hover:text-indigo-400 transition duration-300"><Github className="h-6 w-6" /></a>
+                    <a href={personal.linkedin || '#'} aria-label="LinkedIn" className="text-gray-500 hover:text-orange-400 transition duration-300"><Linkedin className="h-6 w-6" /></a>
+                    <a href={personal.twitter || '#'} aria-label="Twitter" className="text-gray-500 hover:text-orange-400 transition duration-300"><Twitter className="h-6 w-6" /></a>
+                    <a href={personal.github || '#'} aria-label="Github" className="text-gray-500 hover:text-orange-400 transition duration-300"><Github className="h-6 w-6" /></a>
                 </div>
             </div>
           </div>

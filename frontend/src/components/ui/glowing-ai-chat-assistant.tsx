@@ -61,8 +61,8 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
   }, [setOpen]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {/* Floating 3D Glowing AI Logo */}
+    <div className="fixed bottom-24 right-6 md:bottom-6 z-50">
+      {/* Floating 3D Glowing AI Logo - Orange/Yellow Theme */}
       <button
         className={`floating-ai-button relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 transform ${
           open ? 'rotate-90' : 'rotate-0'
@@ -70,8 +70,8 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
         onClick={() => setOpen(!open)}
         aria-label={open ? "Close chat" : "Open chat"}
         style={{
-          background: 'linear-gradient(135deg, rgba(99,102,241,0.8) 0%, rgba(168,85,247,0.8) 100%)',
-          boxShadow: '0 0 20px rgba(139, 92, 246, 0.7), 0 0 40px rgba(124, 58, 237, 0.5), 0 0 60px rgba(109, 40, 217, 0.3)',
+          background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.9) 0%, rgba(249, 115, 22, 0.9) 100%)',
+          boxShadow: '0 0 20px rgba(251, 146, 60, 0.7), 0 0 40px rgba(249, 115, 22, 0.5), 0 0 60px rgba(234, 88, 12, 0.3)',
           border: '2px solid rgba(255, 255, 255, 0.2)',
         }}
       >
@@ -80,7 +80,7 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
         <div className="relative z-10">
           {open ? <X className="w-8 h-8 text-white" /> : <MessageCircle className="w-8 h-8 text-white" />}
         </div>
-        <div className="absolute inset-0 rounded-full animate-ping opacity-20 bg-indigo-500"></div>
+        <div className="absolute inset-0 rounded-full animate-ping opacity-20 bg-orange-500"></div>
       </button>
 
       {/* Chat Interface */}
@@ -97,7 +97,7 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
             {/* Header: Increased padding (px-6 pt-4 pb-4) */}
             <div className="flex items-center justify-between px-6 pt-4 pb-4 border-b border-zinc-700/50">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
                 <span className="text-sm font-semibold text-white">Portfolio Assistant</span>
               </div>
               <button
@@ -120,7 +120,7 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
                   <span
                     className={`inline-block px-3 py-2 rounded-xl max-w-[85%] whitespace-pre-wrap ${
                       m.role === "user"
-                        ? "bg-indigo-500 text-white shadow-md shadow-indigo-500/30"
+                        ? "bg-gradient-to-r from-orange-600 to-yellow-600 text-white shadow-md shadow-orange-500/30"
                         : "bg-zinc-700 text-zinc-100 shadow-md shadow-zinc-700/30"
                     }`}
                   >
@@ -139,19 +139,19 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   rows={1} 
-                  className="flex-1 px-3 py-2 resize-none rounded-xl bg-zinc-800 text-white border border-zinc-600 outline-none focus:ring-2 focus:ring-indigo-500 placeholder-zinc-500 overflow-hidden min-h-[40px]"
+                  className="flex-1 px-3 py-2 resize-none rounded-xl bg-zinc-800 text-white border border-zinc-600 outline-none focus:ring-2 focus:ring-orange-500 placeholder-zinc-500 overflow-hidden min-h-[40px]"
                   placeholder="Type your message..."
                   disabled={isSending}
                 />
                 
-                {/* Send Button */}
+                {/* Send Button - Orange/Yellow Theme */}
                 <button
                   onClick={() => handleSend()}
                   disabled={isSending || !input.trim()}
-                  className="group relative p-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg hover:from-indigo-500 hover:to-indigo-400 hover:scale-110 hover:shadow-indigo-500/30 active:scale-95 transform disabled:opacity-50 flex-shrink-0"
+                  className="group relative p-3 rounded-xl bg-gradient-to-r from-orange-600 to-yellow-600 text-white shadow-lg hover:from-orange-500 hover:to-yellow-500 hover:scale-110 hover:shadow-orange-500/30 active:scale-95 transform disabled:opacity-50 flex-shrink-0"
                   aria-label="Send message"
                   style={{
-                    boxShadow: '0 5px 15px rgba(99,102,241,0.4)',
+                    boxShadow: '0 5px 15px rgba(251, 146, 60, 0.4)',
                   }}
                 >
                   {isSending ? <Bot className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />}
@@ -161,7 +161,7 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
               {/* Minimal Footer Info */}
               <div className="flex justify-between mt-2 text-xs text-zinc-500">
                 <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
                     <span>Operational</span>
                 </div>
                 <div className="text-xs font-medium text-zinc-500">
@@ -170,11 +170,11 @@ const FloatingAiAssistant: React.FC<FloatingAiAssistantProps> = ({
               </div>
             </div>
 
-            {/* Floating Overlay */}
+            {/* Floating Overlay - Orange/Yellow Tinge */}
             <div
               className="absolute inset-0 rounded-3xl pointer-events-none"
               style={{
-                background: 'linear-gradient(135deg, rgba(99,102,241, 0.05), transparent, rgba(168,85,247, 0.05))'
+                background: 'linear-gradient(135deg, rgba(251, 146, 60, 0.05), transparent, rgba(249, 115, 22, 0.05))'
               }}
             ></div>
           </div>

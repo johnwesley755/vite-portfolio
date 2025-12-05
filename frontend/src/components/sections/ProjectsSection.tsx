@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useRef, Component, ErrorInfo, ReactNode, useMemo } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { useInteraction } from "../../lib/interaction-context"; 
 import {
   Github,
@@ -21,20 +21,12 @@ import { motion } from "framer-motion";
 import { portfolioData } from "../../data/portfolio"; 
 import { LinkPreview } from "../ui/link-preview"; 
 import { AnimatedTooltip } from "../ui/animated-tooltip";
-
 // SHADCN CARD & BUTTON IMPORTS
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/Card"; // Placeholder import
-import { Button } from "../ui/Button"; // Reusing Button for Tabs/Filters
+import { Card, CardContent, CardDescription, CardTitle } from "../ui/Card"; // Placeholder import
 
 // --- SHADCN TABS IMPORTS (NEW) ---
 // Assuming these are the standard shadcn components
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"; // Placeholder import
-
-// --- THREE.JS IMPORTS (For Background) ---
-import * as THREE from 'three'; 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, PerspectiveCamera, OrbitControls, MeshDistortMaterial, Sphere } from "@react-three/drei"; 
-
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"; // Placeholder import 
 
 // -------------------------------------------------------------------
 // --- TYPE DEFINITIONS ---
@@ -57,75 +49,7 @@ interface Project {
   size: "small" | "medium" | "large";
 }
 
-// -------------------------------------------------------------------
-// --- 3D COMPONENTS AND LOGIC (FOR BACKGROUND) ---
-// -------------------------------------------------------------------
 
-// --- Error Boundary Component (Self-Contained) ---
-interface ErrorBoundaryProps { children: ReactNode; }
-interface ErrorBoundaryState { hasError: boolean; }
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public state: ErrorBoundaryState = { hasError: false };
-
-  public static getDerivedStateFromError(_: Error): ErrorBoundaryState {
-    return { hasError: true };
-  }
-
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error in Three.js Canvas:", error, errorInfo);
-  }
-
-  public render() {
-    if (this.state.hasError) {
-      return (
-        <div className="flex justify-center items-center h-full text-red-400 bg-black/50 p-8">
-          <p className="text-center text-lg font-semibold border border-red-500/50 p-4 rounded-lg bg-red-900/10 backdrop-blur-sm">
-            ❌ **3D Background Failed.** <br />
-            Check console for errors.
-          </p>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-
-// --- Blob Component for Background ---
-interface BlobProps {
-  position: [number, number, number];
-  scale: number;
-  color: string;
-  speed: number;
-  distort: number;
-  rotationSpeed?: number;
-}
-
-const Blob: React.FC<BlobProps> = ({ position, scale, color, speed, distort, rotationSpeed = 0.5 }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      // Gentle rotation
-      meshRef.current.rotation.x = meshRef.current.rotation.y = meshRef.current.rotation.z += 0.002 * rotationSpeed; 
-      // Slow floating movement
-      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed * 0.2) * 0.8; 
-    }
-  });
-
-  return (
-    <Sphere args={[1, 64, 64]} position={position} scale={scale} ref={meshRef}>
-      <MeshDistortMaterial
-        color={color}
-        distort={distort} 
-        speed={speed} 
-        roughness={0.5}
-        metalness={0.5}
-      />
-    </Sphere>
-  );
-};
 
 
 // -------------------------------------------------------------------
@@ -197,13 +121,19 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
     const [isHovered, setIsHovered] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const cardRef = useRef<HTMLDivElement>(null);
+    const throttleRef = useRef<number>(0);
   
     const tooltipItems = useMemo(
       () => getTooltipItems(project.techStack),
       [project.techStack]
     );
   
+    // Throttled mouse move for better INP
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+      const now = Date.now();
+      if (now - throttleRef.current < 16) return; // ~60fps throttle
+      throttleRef.current = now;
+      
       if (!cardRef.current) return;
       const rect = cardRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -212,7 +142,7 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
     };
   
     // Card classes 
-    const cardClasses = `group relative overflow-hidden backdrop-blur-sm border transition-all duration-300 hover:-translate-y-2 hover:z-20 rounded-2xl shadow-xl hover:shadow-2xl col-span-1 row-span-1 bg-black/95 border-purple-500/30 hover:border-purple-400/60 hover:shadow-purple-500/30`;
+    const cardClasses = `group relative overflow-hidden border transition-all duration-300 hover:-translate-y-2 hover:z-20 rounded-2xl shadow-xl hover:shadow-2xl col-span-1 row-span-1 bg-black border-yellow-500/30 hover:border-yellow-400/60 hover:shadow-yellow-500/30`;
   
     return (
       // ADDED MOTION WRAPPER FOR INDIVIDUAL CARD APPEARANCE
@@ -232,13 +162,13 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"
             style={{
-              background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(139, 92, 246, 0.15), transparent 70%)`,
+              background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(251, 146, 60, 0.15), transparent 70%)`,
             }}
           />
         
           {/* Ambient Light Border (More pronounced hover) */}
           <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-purple-500/10 blur-xl" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-red-500/10 blur-xl" />
           </div>
         
           {/* Content Container (CardContent/CardHeader equivalent structure) */}
@@ -265,7 +195,7 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
                   </div>
                 )}
                 <div
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl backdrop-blur-lg border border-white/20 ${
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-xl border border-white/20 ${
                     project.status === "Live"
                       ? "bg-gradient-to-r from-green-500/80 to-teal-500/80 text-white"
                       : project.status === "In Development"
@@ -290,7 +220,7 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
           
               {/* Bottom-left: Stars/Popularity */}
               <div className="absolute bottom-4 left-4 flex items-center gap-2 z-10">
-                <div className="px-4 py-2 bg-black/70 backdrop-blur-md rounded-xl text-xs text-white flex items-center gap-2 border border-yellow-400/40 shadow-xl hover:border-yellow-400/70 transition-all duration-300 group/stars">
+                <div className="px-4 py-2 bg-black/80 rounded-xl text-xs text-white flex items-center gap-2 border border-yellow-400/40 shadow-xl hover:border-yellow-400/70 transition-all duration-300 group/stars">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 group-hover/stars:scale-110 transition-transform" />
                   <span className="font-extrabold text-sm">{project.stars}</span>
                 </div>
@@ -298,7 +228,7 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
           
               {/* Bottom-right: Category */}
               <div className="absolute bottom-4 right-4 z-10">
-                <div className="px-4 py-2 bg-black/70 backdrop-blur-md rounded-xl text-xs text-blue-300 border border-blue-400/40 font-semibold shadow-xl hover:border-blue-400/70 transition-all duration-300">
+                <div className="px-4 py-2 bg-black/80 rounded-xl text-xs text-blue-300 border border-blue-400/40 font-semibold shadow-xl hover:border-blue-400/70 transition-all duration-300">
                   <span className="tracking-wide uppercase">{project.category}</span>
                 </div>
               </div>
@@ -308,12 +238,12 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
             <div className="flex-1 flex flex-col p-6 sm:p-7">
               <div className="flex items-start gap-4 mb-4">
                 {/* Icon Box */}
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-blue-400/40 transition-all duration-300 group-hover:scale-[1.15] group-hover:rotate-3 shadow-xl group-hover:shadow-blue-500/50">
+                <div className="p-3.5 rounded-xl bg-gradient-to-br from-orange-500/30 to-yellow-500/30 border border-orange-400/40 transition-all duration-300 group-hover:scale-[1.15] group-hover:rotate-3 shadow-xl group-hover:shadow-orange-500/50">
                   {getIcon(project.icon)}
                 </div>
                 <div className="flex-1">
                   {/* Title */}
-                  <CardTitle className="font-extrabold text-2xl text-white leading-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-300 group-hover:to-cyan-300 group-hover:bg-clip-text transition-all duration-200 tracking-tighter">
+                  <CardTitle className="font-extrabold text-2xl text-white leading-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-orange-300 group-hover:to-yellow-300 group-hover:bg-clip-text transition-all duration-200 tracking-tighter">
                     {project.title}
                   </CardTitle>
                   {/* Role/Year */}
@@ -341,10 +271,10 @@ const ProjectCard: React.FC<{ project: Project; index: number }> = ({
                 <LinkPreview url={project.demoLink} className="p-0 flex-1">
                   <div className="w-full relative group/btn cursor-pointer">
                     {/* Glow effect */}
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl blur opacity-75 group-hover/btn:opacity-100 transition duration-300 animate-pulse" />
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl blur opacity-75 group-hover/btn:opacity-100 transition duration-300 animate-pulse" />
           
                     {/* Button */}
-                    <div className="relative inline-flex w-full items-center justify-center gap-2 font-extrabold rounded-xl transition-all duration-200 overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-5 py-3.5 text-sm shadow-2xl">
+                    <div className="relative inline-flex w-full items-center justify-center gap-2 font-extrabold rounded-xl transition-all duration-200 overflow-hidden bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white px-5 py-3.5 text-sm shadow-2xl">
                       {/* Shine effect */}
                       <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
           
@@ -389,8 +319,8 @@ const ProjectGrid: React.FC<{ filteredProjects: Project[] }> = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1, // Stagger the appearance of each card
-        delayChildren: 0.2,
+        staggerChildren: 0.05, // Reduced from 0.1 for better INP
+        delayChildren: 0.1,
       },
     },
   };
@@ -454,72 +384,28 @@ const ProjectsSection: React.FC = () => {
     : byCategory;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [showBackground, setShowBackground] = useState(false);
-  useEffect(() => {
-    const t = containerRef.current;
-    if (!t) return;
-    const io = new IntersectionObserver((entries) => {
-      setShowBackground(entries[0].isIntersecting);
-    }, { rootMargin: "-20% 0px -20% 0px", threshold: 0.1 });
-    io.observe(t);
-    return () => io.disconnect();
-  }, []);
+
+  // No liquid background - removed for performance
+
 
   return (
     
       <section
         ref={containerRef}
-        className="w-full min-h-screen relative overflow-hidden bg-gray-950/90" 
+        className="w-full min-h-screen relative overflow-hidden bg-black border-0" 
         id="projects"
+        style={{ border: 'none', outline: 'none' }}
       >
-        {/* Added an overall subtle background gradient for aesthetic depth */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(10, 14, 21, 0.05),transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(168,85,247,0.05),transparent_60%)]" />
+        {/* Pure black background */}
+        <div className="absolute inset-0 bg-black" />
 
-        {/* --- 3D Background Layer (Z-0) --- 
-              Opacity set to 50% for good subtle visibility.
-        */}
-        <div className="absolute inset-0 z-0 opacity-50"> 
-            <ErrorBoundary>
-                {showBackground && (
-                <Canvas 
-                    shadows 
-                    dpr={[1, 1]} 
-                    gl={{ alpha: true, antialias: true }}
-                    className="bg-transparent"
-                >
-                    {/* Camera: FOV adjusted to 45 */}
-                    <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={45} /> 
-                    
-                    {/* Lighting: Increased intensity for visibility. */}
-                    <ambientLight intensity={0.5} /> 
-                    <directionalLight position={[10, 10, 10]} intensity={0.7} castShadow />
-                    
-                    {/* Blobs for abstract background movement */}
-                    <Suspense fallback={null}>
-                        <Blob position={[10, 8, -22]} scale={4} color="#5A00FF" speed={0.6} distort={0.5} rotationSpeed={0.3} />
-                    </Suspense>
+        {/* Golden Tinge Overlay */}
+        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-amber-500/5 via-transparent to-orange-500/5" />
+        <div className="absolute inset-0 z-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08) 0%, transparent 60%)'
+        }} />
 
-                    
-                    {/* Orbit controls */}
-                    <OrbitControls
-                        enableZoom={false}
-                        enablePan={false}
-                        autoRotate
-                        autoRotateSpeed={0.1}
-                        maxDistance={35}
-                        minDistance={25}
-                    />
-                    
 
-                </Canvas>
-                )}
-            </ErrorBoundary>
-        </div>
-        {/* --- Background Overlay Layer (Z-10) --- */}
-        <div className="absolute inset-0 z-10 pointer-events-none">
-             {/* Radial fade to blur edges and focus content */}
-             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.9)_100%)]" />
-        </div>
         
 
         {/* --- Content Layer (Z-20) --- */}
@@ -557,7 +443,7 @@ const ProjectsSection: React.FC = () => {
               onValueChange={setFilter} 
               className="w-full max-w-fit flex justify-center" // Added for centering and control
             >
-              <TabsList className="flex flex-wrap h-auto p-1 bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-lg shadow-2xl">
+              <TabsList className="flex flex-wrap h-auto p-1 bg-black border border-gray-700/50 rounded-lg shadow-2xl">
                 {categories.map((category) => (
                   <TabsTrigger 
                     key={category.name} 
@@ -593,7 +479,7 @@ const ProjectsSection: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
-                className="mt-6 px-5 py-3 rounded-full text-xs font-bold bg-gradient-to-r from-blue-500/30 to-cyan-500/30 text-cyan-200 border-2 border-blue-500/50 tracking-wide backdrop-blur-md shadow-lg"
+                className="mt-6 px-5 py-3 rounded-full text-xs font-bold bg-gradient-to-r from-orange-500/40 to-yellow-500/40 text-yellow-200 border-2 border-orange-500/50 tracking-wide shadow-lg"
                 style={{ letterSpacing: "0.025em" }}
               >
                 <Code className="w-4 h-4 inline-block mr-2 align-text-bottom" />

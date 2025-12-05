@@ -10,12 +10,12 @@
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', 'Poppins Fallback', sans-serif;
   letter-spacing: 1.5px;
 }
 
 * {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', 'Inter Fallback', sans-serif;
 }
 
 /* Theme Variables */
@@ -288,6 +288,50 @@ h1, h2, h3, h4, h5, h6 {
   
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Font fallback metrics to prevent CLS */
+  @font-face {
+    font-family: 'Poppins Fallback';
+    src: local('Arial');
+    size-adjust: 105%;
+    ascent-override: 95%;
+    descent-override: 25%;
+    line-gap-override: 0%;
+  }
+  
+  @font-face {
+    font-family: 'Inter Fallback';
+    src: local('Arial');
+    size-adjust: 107%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+  }
+  
+  /* Performance: will-change hints for animated elements */
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .will-change-opacity {
+    will-change: opacity;
+  }
+  
+  /* Performance: CSS containment for isolated sections */
+  section:not(#projects) {
+    contain: layout style paint;
+  }
+  
+  /* Performance: Optimize animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
   
   /* CSS Custom Properties for Gradient Animations */

@@ -185,6 +185,12 @@ const SkillsSection = () => {
   }, []);
   return (
     <section ref={containerRef} className="relative w-full min-h-screen bg-black overflow-hidden py-20 lg:py-32">
+      {/* Golden Tinge Overlay */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-amber-500/5 via-transparent to-orange-500/5" />
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08) 0%, transparent 60%)'
+      }} />
+
       {/* 3D Model Background - MUCH LARGER AND MORE VISIBLE */}
       <div className="absolute inset-0 w-full h-full mt-80">
         {showCanvas && (

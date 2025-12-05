@@ -27,7 +27,6 @@ import { Badge } from "../ui/Badge";
 // --- THREE.JS IMPORTS ---
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
-  Environment,
   useGLTF,
   PerspectiveCamera,
   OrbitControls,
@@ -205,6 +204,8 @@ const Blob: React.FC<BlobProps> = ({
         speed={speed}
         roughness={0.5}
         metalness={0.5}
+        transparent={true}
+        opacity={0.4}
       />
     </Sphere>
   );
@@ -248,15 +249,9 @@ const Header: React.FC<{ onDownload: () => void }> = ({ onDownload }) => (
 // -------------------------------------------------------------------
 
 export const HeroSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const [showHero3D, setShowHero3D] = useState(false);
   const [canvasReady, setCanvasReady] = useState(false);
-  const [showBio, setShowBio] = useState(false);
   const heroRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   useEffect(() => {
     const target = heroRef.current;
@@ -277,15 +272,11 @@ export const HeroSection = () => {
 
   useEffect(() => {
     if (showHero3D) {
-      const t = setTimeout(() => setCanvasReady(true), 1200);
+      // Reduced delay from 1200ms to 300ms for faster LCP
+      const t = setTimeout(() => setCanvasReady(true), 300);
       return () => clearTimeout(t);
     }
   }, [showHero3D]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setShowBio(true), 1200);
-    return () => clearTimeout(t);
-  }, []);
 
   const handleDownload = () => {
     if (typedPortfolioData.resume) {
@@ -307,6 +298,12 @@ export const HeroSection = () => {
     >
       <Header onDownload={handleDownload} />
 
+      {/* Golden Tinge Overlay */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-amber-500/5 via-transparent to-orange-500/5" />
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08) 0%, transparent 60%)'
+      }} />
+
       {canvasReady && (
         <>
           <div className="absolute inset-0 z-0 opacity-10" style={SVG_STYLE} />
@@ -319,12 +316,15 @@ export const HeroSection = () => {
           <ErrorBoundary>
             <Canvas
               shadows
-              dpr={[1, 1]}
+              dpr={[1, 1.5]}
               gl={{
                 alpha: true,
-                antialias: true,
+                antialias: false,
                 powerPreference: "low-power",
+                stencil: false,
+                depth: true,
               }}
+              performance={{ min: 0.5 }}
               className="bg-transparent"
             >
               <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={25} />
@@ -347,55 +347,31 @@ export const HeroSection = () => {
                 color="#88a9f2"
               />
 
-              {/* Background blobs */}
+              {/* Background blobs - Reduced from 6 to 3 for better INP */}
               <Suspense fallback={null}>
                 <Blob
                   position={[13, 5, -15]}
-                  scale={3}
-                  color="#2F004F"
-                  speed={1.5}
-                  distort={0.6}
-                  rotationSpeed={0.7}
-                />
-                <Blob
-                  position={[-5, -7, -18]}
-                  scale={4}
-                  color="#003D4D"
+                  scale={3.5}
+                  color="#F59E0B"
                   speed={1.2}
-                  distort={0.7}
+                  distort={0.5}
                   rotationSpeed={0.5}
                 />
                 <Blob
-                  position={[18, -3, -28]}
-                  scale={2.5}
-                  color="#2F004F"
-                  speed={0.9}
-                  distort={0.5}
+                  position={[-8, -7, -20]}
+                  scale={4}
+                  color="#FB923C"
+                  speed={1.0}
+                  distort={0.6}
                   rotationSpeed={0.4}
                 />
                 <Blob
-                  position={[-12, 8, -26]}
-                  scale={2.8}
-                  color="#003D4D"
+                  position={[0, 8, -25]}
+                  scale={3}
+                  color="#FBBF24"
                   speed={0.8}
                   distort={0.5}
-                  rotationSpeed={0.4}
-                />
-                <Blob
-                  position={[8, 10, -22]}
-                  scale={2.2}
-                  color="#2F004F"
-                  speed={0.95}
-                  distort={0.55}
-                  rotationSpeed={0.5}
-                />
-                <Blob
-                  position={[-16, 3, -30]}
-                  scale={3.1}
-                  color="#003D4D"
-                  speed={0.85}
-                  distort={0.5}
-                  rotationSpeed={0.4}
+                  rotationSpeed={0.3}
                 />
               </Suspense>
 
@@ -457,7 +433,7 @@ export const HeroSection = () => {
                   variants={fadeUpVariants}
                   initial="hidden"
                   animate="visible"
-                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight tracking-tight whitespace-nowrap"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight tracking-tight whitespace-nowrap"
                 >
                   <span className="text-white">
                     {firstName}{" "}
@@ -469,7 +445,7 @@ export const HeroSection = () => {
                   animate={{ scaleX: 1, opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.3 }}
                   style={{ transformOrigin: "left" }}
-                  className="h-[2px] w-40 sm:w-56 bg-gradient-to-r from-cyan-400/50 via-blue-500/50 to-purple-500/50 rounded-full mx-auto lg:mx-0"
+                  className="h-[2px] w-40 sm:w-56 bg-gradient-to-r from-red-400/50 via-yellow-500/50 to-orange-500/50 rounded-full mx-auto lg:mx-0"
                 />
 
                 <motion.h2
@@ -483,11 +459,10 @@ export const HeroSection = () => {
                 </motion.h2>
 
                 <div className="pt-2">
-                  {showBio && (
-                    <p className="text-base sm:text-lg lg:text-xl text-gray-400/90 leading-relaxed font-normal tracking-wide max-w-2xl md:max-w-3xl mx-auto lg:mx-0">
-                      {typedPortfolioData.bio}
-                    </p>
-                  )}
+                  {/* Removed showBio delay - critical for LCP improvement */}
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-400/90 leading-relaxed font-normal tracking-wide max-w-2xl md:max-w-3xl mx-auto lg:mx-0" style={{ willChange: 'contents' }}>
+                    {typedPortfolioData.bio}
+                  </p>
                 </div>
 
                 <motion.div

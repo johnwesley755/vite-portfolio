@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, Suspense } from "react";
 import {
   Award,
   Code,
@@ -14,7 +14,10 @@ import {
   Shield,
 } from "lucide-react";
 import { portfolioData } from "../../data/portfolio"; 
-import { Timeline, type TimelineEntry } from "../ui/timeline"; 
+import { Timeline, type TimelineEntry } from "../ui/timeline";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { MeshDistortMaterial, Sphere, PerspectiveCamera } from "@react-three/drei";
+import * as THREE from "three";
 
 // Mock Context Hook (kept for safety)
 const useInteraction = () => ({ selectedSkill: "" }); 
@@ -90,18 +93,131 @@ const mapExperienceToTimeline = (experiences: typeof portfolioData.experiences):
 
 const timelineData = mapExperienceToTimeline(portfolioData.experiences);
 
-// Simplified Background - No Heavy Animations
+// --- 3D Blob Component ---
+interface BlobProps {
+  position: [number, number, number];
+  scale: number;
+  color: string;
+  speed: number;
+  distort: number;
+  rotationSpeed?: number;
+}
+
+const Blob: React.FC<BlobProps> = ({
+  position,
+  scale,
+  color,
+  speed,
+  distort,
+  rotationSpeed = 0.5,
+}) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      // Gentle rotation
+      meshRef.current.rotation.x =
+        meshRef.current.rotation.y =
+        meshRef.current.rotation.z +=
+          0.005 * rotationSpeed;
+      // Gentle floating
+      meshRef.current.position.y =
+        position[1] + Math.sin(state.clock.elapsedTime * speed) * 0.5;
+    }
+  });
+
+  return (
+    <Sphere args={[1, 64, 64]} position={position} scale={scale} ref={meshRef}>
+      <MeshDistortMaterial
+        color={color}
+        distort={distort}
+        speed={speed}
+        roughness={0.5}
+        metalness={0.5}
+        transparent={true}
+        opacity={0.3}
+      />
+    </Sphere>
+  );
+};
+
+// Background with 3D Blobs
 const BackgroundFX = () => (
   <>
     {/* Base Black Background */}
     <div className="absolute inset-0 -z-20 bg-black"></div> 
     
+    {/* 3D Blobs Canvas */}
+    <div className="absolute inset-0 z-0">
+      <Canvas
+        shadows
+        dpr={[1, 1.5]}
+        gl={{
+          alpha: true,
+          antialias: false,
+          powerPreference: "low-power",
+          stencil: false,
+          depth: true,
+        }}
+        performance={{ min: 0.5 }}
+        className="bg-transparent"
+      >
+        <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={25} />
+
+        <ambientLight intensity={0.8} />
+        <hemisphereLight args={["#8dc6ff", "#1a1a1a", 0.9]} />
+        <directionalLight
+          position={[5, 10, 5]}
+          intensity={1.4}
+          castShadow
+        />
+
+        <Suspense fallback={null}>
+          <Blob
+            position={[-3, -6, -12]}
+            scale={1.2}
+            color="#F59E0B"
+            speed={0.9}
+            distort={0.4}
+            rotationSpeed={0.4}
+          />
+          <Blob
+            position={[2.3, -3, -14]}
+            scale={1.2}
+            color="#FB923C"
+            speed={1.1}
+            distort={0.5}
+            rotationSpeed={0.5}
+          />
+          <Blob
+            position={[3, 5, -10]}
+            scale={1}
+            color="#FBBF24"
+            speed={0.7}
+            distort={0.4}
+            rotationSpeed={0.3}
+          />
+          <Blob
+            position={[-3, 1, -13]}
+            scale={1.2}
+            color="#F97316"
+            speed={0.8}
+            distort={0.45}
+            rotationSpeed={0.35}
+          />
+        </Suspense>
+      </Canvas>
+    </div>
+
     <div className="absolute inset-0 -z-10">
       {/* Grid Pattern (Subtle) */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-30"></div>
       
-      {/* Simple Static Gradient Overlay - No Animation */}
-      <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 via-transparent to-purple-500/5"></div>
+      {/* Golden tinge overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 via-transparent to-orange-500/5" />
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08) 0%, transparent 60%)'
+      }} />
     </div>
   </>
 );
