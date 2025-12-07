@@ -447,9 +447,61 @@ export const portfolioData = {
     },
   ],
   // END OF MOVED PROJECTS DATA
-  experiences: [
+experiences: [
+    // 🔹 Moved from old id: 6 → now id: 1
     {
       id: 1,
+      title: "Symposium Website Developer",
+      organization: "Department Symposium – College of Engineering",
+      period: "2025",
+      type: "project",
+      description:
+        "Designed and developed the official symposium website for my department, handling complete frontend implementation and deployment.",
+      achievements: [
+        "Built a modern, responsive landing page for event registration and schedule.",
+        "Integrated registration form, event timeline, and speaker sections.",
+        "Collaborated with faculty organizers to iteratively refine the UI/UX.",
+      ],
+      skills: ["React", "TypeScript", "Tailwind CSS", "Firebase Hosting"],
+      image: "/images/experience/symposium-1.png",
+      icon: "Rocket",
+      liveDemos: [
+        {
+          label: "Live Demo",
+          url: "https://english-symposium.vercel.app/",
+        },
+      ],
+    },
+
+    // 🔹 Moved from old id: 7 → now id: 2
+    {
+      id: 2,
+      title: "Full-stack Developer – Technical Symposium",
+      organization: "College Technical Symposium",
+      period: "2025",
+      type: "project",
+      description:
+        "Worked as a developer for another major technical symposium in my college, focusing on feature enhancements and performance improvements.",
+      achievements: [
+        "Implemented admin features to manage events and participants.",
+        "Optimized page load and reduced bundle size for smoother UX.",
+        "Handled deployment, bug fixes, and last-minute changes before the event.",
+      ],
+      skills: ["Next.js", "Node.js", "MongoDB", "Tailwind CSS"],
+      image: "/images/experience/symposium-2.png",
+      icon: "Briefcase",
+      liveDemos: [
+        {
+          label: "Live Demo",
+          url: "https://ads-symposium-website.vercel.app/",
+        },
+      ],
+    },
+
+    // 🔽 Everything below is same experiences you already had, just re-numbered
+
+    {
+      id: 3,
       title: "IBM Full Stack Developer Certification",
       organization: "IBM",
       period: "2025",
@@ -475,7 +527,7 @@ export const portfolioData = {
       ],
     },
     {
-      id: 2,
+      id: 4,
       title: "Frontend for Java Full Stack Development",
       organization: "Coursera",
       period: "2025",
@@ -493,7 +545,7 @@ export const portfolioData = {
       ],
     },
     {
-      id: 3,
+      id: 5,
       title: "Google UX Design Certification",
       organization: "Google",
       period: "2025",
@@ -517,9 +569,9 @@ export const portfolioData = {
         "Certified in accessibility standards",
       ],
     },
-    // Added Hackathon Experiences
+    // Hackathon Experiences
     {
-      id: 4,
+      id: 6,
       title: "Pitchathon",
       organization: "Vellore Institute of Technology, Chennai.",
       period: "2024",
@@ -542,7 +594,7 @@ export const portfolioData = {
       ],
     },
     {
-      id: 5,
+      id: 7,
       title: "Innothon '24",
       organization: "KCG College of Technology,Chennai.",
       period: "2024",
@@ -551,13 +603,7 @@ export const portfolioData = {
         "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop",
       description:
         "Developed innovative computer vision solution using machine learning algorithms for fashion retail industry",
-      skills: [
-        "React",
-        "Machine Learning",
-        "Python",
-        "API Integration",
-        "Team Leadership",
-      ],
+      skills: ["React", "Machine Learning"],
       icon: "Shield",
       achievements: [
         "Advanced to finals in prestigious AI/ML hackathon focused on computer vision applications",

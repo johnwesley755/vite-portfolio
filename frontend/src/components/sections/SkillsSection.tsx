@@ -65,11 +65,6 @@ const skillsData = [
     color: "#3178C6" 
   },
   { 
-    name: "Flutter", 
-    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flutter/flutter-original.svg",
-    color: "#02569B" 
-  },
-  { 
     name: "WebRTC", 
     logo: "https://webrtc.github.io/webrtc-org/assets/images/webrtc-logo-vert-retro-255x305.png",
     color: "#333333" 

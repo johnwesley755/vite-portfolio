@@ -70,6 +70,12 @@ export const Footer = ({
       )}
     >
       <footer className="relative bg-black/95">
+        {/* Golden Tinge Overlay */}
+        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-amber-500/5 via-transparent to-orange-500/5" />
+        <div className="absolute inset-0 z-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse at center, rgba(251, 191, 36, 0.08) 0%, transparent 60%)'
+        }} />
+
         {/* Soft glow rising from the footer */}
         <div
           className="pointer-events-none absolute inset-x-0 -top-32 h-64 bg-gradient-to-b from-white/15 via-white/5 to-transparent opacity-60 blur-xl"

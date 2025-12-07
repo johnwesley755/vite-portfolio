@@ -305,8 +305,8 @@ export default function ContactSection() {
 
                 {/* Submit and Reset Buttons */}
                 <div className="flex flex-wrap gap-4 items-center pt-2">
-                  <button type="submit" disabled={status.loading} className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3 sm:py-4 rounded-lg bg-orange-500 text-white text-base sm:text-lg font-medium tracking-wide shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <button type="submit" disabled={status.loading} className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3 sm:py-4 rounded-lg bg-gradient-to-r from-yellow-400 via-red-500 to-orange-600 text-white text-base sm:text-lg font-medium tracking-wide shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-red-500 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     {status.loading ? (
                       <><div className="relative z-10 animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /><span className="relative z-10">SUBMITTING...</span></>
                     ) : (
