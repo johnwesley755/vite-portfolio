@@ -27,10 +27,6 @@ import { Card, CardContent, CardDescription, CardTitle } from "../ui/Card"; // P
 // --- SHADCN TABS IMPORTS (NEW) ---
 // Assuming these are the standard shadcn components
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"; // Placeholder import 
-
-// -------------------------------------------------------------------
-// --- TYPE DEFINITIONS ---
-// -------------------------------------------------------------------
 interface Project {
   id: number;
   title: string;
